@@ -21,6 +21,9 @@ export default class Scene extends Component<SceneProps> {
 
     public scene = new THREE.Scene();
     public player : any;
+
+    public mobs : any[] = [];
+
     public worldOctree = new Octree();
     public camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
     public renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -105,6 +108,7 @@ export default class Scene extends Component<SceneProps> {
 
     // path: chemin vers le fichier
     // r_: rayon du modèle (pour les collisions)
+
     loadCoin() {
         this.loader.load( 'coin.gltf.glb', ( gltf ) => {
             const model_ = gltf.scene.clone();

@@ -57,7 +57,8 @@ export default class Sphere extends Component<SphereProps> {
 
     }
 
-    static updateSpheres( scene : any, deltaTime : number, gravity : number, mob : Mob ) {
+
+    static updateSpheres( scene : any, deltaTime : number, gravity : number, mobs : Mob[] ) {
         // concat between list of coins and list of others
         let spheres = scene.list_coins.concat(scene.list_others);
         spheres.forEach( ( sphere : any)  => {
@@ -83,7 +84,7 @@ export default class Sphere extends Component<SphereProps> {
 
             // léger effet de rotation
             sphere.mesh.rotation.y += 1 * deltaTime;
-            mob.mobSphereCollision( sphere );
+            mobs.forEach( ( mob : any ) => mob.mobSphereCollision( sphere ) );
             scene.playerSphereCollision( sphere );
 
         } );

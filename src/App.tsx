@@ -14,7 +14,12 @@ function App() {
     const player = new Player( { gravity: 30, scene, mouseTime } );
     scene.player = player;
 
-    const mob = new Mob( { gravity: 100, scene } );
+    const mobs : any[] = [];
+    for (let i = 0; i < 20 ; i++) {
+        const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 20, 5, Math.random() * 20 ), id: i, model_path: "Skeleton_Mage.glb" } );
+        mobs.push(mob);
+    }
+    scene.mobs = mobs;
 
     document.addEventListener( 'keydown', ( event ) => {
 
@@ -66,11 +71,14 @@ function App() {
 
             player.updatePlayer( deltaTime );
 
-            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, mob );
+
+            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, mobs );
 
             player.teleportPlayerIfOob();
 
-            mob.updateMob(deltaTime);
+            mobs.forEach( ( mob ) => {
+                mob.updateMob(deltaTime);
+            });
 
         }
 
