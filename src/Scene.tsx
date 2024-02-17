@@ -195,7 +195,6 @@ export default class Scene extends Component<SceneProps> {
 
                     // and add new coin
                     this.player.list_coins_index -= 1;
-                    //this.compteur_coins -= 1;
                     this.loadCoin();
                 }
 
