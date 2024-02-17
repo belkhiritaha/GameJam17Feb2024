@@ -71,7 +71,7 @@ export default class Sphere extends Component<SphereProps> {
 
                 sphere.velocity.addScaledVector( result.normal, - result.normal.dot( sphere.velocity ) * 1.5 );
                 sphere.collider.center.add( result.normal.multiplyScalar( result.depth ) );
-
+                sphere.isBeingThrown = false;
             } else {
 
                 sphere.velocity.y -= gravity * deltaTime;

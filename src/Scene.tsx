@@ -125,6 +125,7 @@ export default class Scene extends Component<SceneProps> {
                 id: "coin_number_" + this.compteur_coins,
                 isCoin: true,
                 isOnGround: onGround,
+                isBeingThrown: false,
                 mesh: model_,
                 collider: new THREE.Sphere( position , 0.2 ),
                 velocity: velocity
@@ -150,6 +151,7 @@ export default class Scene extends Component<SceneProps> {
                 id: "others_number_" + this.compteur_others,
                 isCoin: false,
                 isOnGround: onGround,
+                isBeingThrown: false,
                 mesh: model_,
                 collider: new THREE.Sphere( position, r_ ),
                 velocity: velocity

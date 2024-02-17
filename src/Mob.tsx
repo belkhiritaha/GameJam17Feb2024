@@ -122,18 +122,30 @@ export default class Mob extends Component<MobProps> {
 
                 const d = ( r - Math.sqrt( d2 ) ) / 2;
                 sphere_center.addScaledVector( normal, - d );
-                this.hp -= 10;
+                if (sphere.isBeingThrown) {
+                    this.hp -= 25;
+                    sphere.isBeingThrown = false;
 
-                // update hp bar
-                const hpBar = this.gltf.children
-                    .find((child : any) => child.name === "hpBar");
-                if (hpBar) {
-                    hpBar.scale.x = this.hp / 100;
-                }
+                    // update hp bar
+                    const hpBar = this.gltf.children
+                        .find((child : any) => child.name === "hpBar");
+                    if (hpBar) {
+                        hpBar.scale.x = this.hp / 100;
+                    }
 
-                // if mob is dead
-                if (this.hp <= 0 && !this.isDead) {
-                    this.killMob();
+                    // if mob is dead
+                    if (this.hp <= 0 && !this.isDead) {
+                        this.killMob();
+                    }
+
+                    if (sphere.isCoin) {
+                        // delete the coin
+                        const coinSphere = this.props.scene.scene.getObjectByName(sphere.mesh.name);
+                        if (coinSphere) {
+                            this.props.scene.scene.remove(coinSphere);
+                        }
+                        this.props.scene.list_coins.splice(this.props.scene.list_coins.findIndex((coin : any) => coin.id === sphere.id), 1);
+                    }
                 }
             }
 
@@ -157,7 +169,7 @@ export default class Mob extends Component<MobProps> {
                 const z = center.z + radius * Math.sin(angle);
                 // initial outwards velocity
                 const vel = new THREE.Vector3(x - center.x, 0, z - center.z).normalize().multiplyScalar(10);
-                if (i < 3) {
+                if (i < 2) {
                     this.props.scene.loadCoin( new THREE.Vector3(x, center.y, z), vel, true );
                 }
                 else {

@@ -14,11 +14,8 @@ function App() {
     const player = new Player( { gravity: 30, scene, mouseTime } );
     scene.player = player;
 
-    player.ammo_coin = 5;
-    player.ammo_others = 4;
-
     const mobs : any[] = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 20, 5, Math.random() * 20 ), id: i, model_path: "Skeleton_Mage.glb" } );
         mobs.push(mob);
     }

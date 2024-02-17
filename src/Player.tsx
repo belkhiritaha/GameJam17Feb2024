@@ -99,6 +99,7 @@ export default class Player extends Component<PlayerProps> {
 
             // make it on ground
             other.isOnGround = true;
+            other.isBeingThrown = true;
 
         } else {
             if(this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length > 0) {
@@ -112,6 +113,7 @@ export default class Player extends Component<PlayerProps> {
 
                 // make it on ground
                 coin.isOnGround = true;
+                coin.isBeingThrown = true;
             }
         }
     }
