@@ -7,6 +7,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 interface MobProps {
     scene: any;
     gravity: number;
+    position: THREE.Vector3;
+    id: number;
+    model_path: string;
 }
 
 export default class Mob extends Component<MobProps> {
@@ -14,13 +17,13 @@ export default class Mob extends Component<MobProps> {
     public mobVelocity = new THREE.Vector3();
     public mobOnFloor = false;
     public keyStates : any = {};
-    public mobCollider = new Capsule( new THREE.Vector3( 0, 5.35, 0 ), new THREE.Vector3( 0, 6, 0 ), 0.35 );
+    public mobCollider = new Capsule( this.props.position.clone(), this.props.position.clone().add(new THREE.Vector3(0, 1, 0)), 0.35 );
     public sphereIdx = 0;
     public isDead = false;
+    public id: number;
 
     public gltf : any;
     public mixer : any;
-    public runAction : any;
     public idleAction : any;
     public attackAction : any = [];
     public hp = 100;
@@ -29,13 +32,14 @@ export default class Mob extends Component<MobProps> {
     constructor( props : MobProps ) {
 
         super( props );
+        this.id = props.id;
 
-        const loader = new GLTFLoader();
+        const loader = new GLTFLoader().setPath( './models/gltf/' );
 
         // const texture = new THREE.TextureLoader().load("knight_texture.png");
 
         loader.load(
-            "/models/gltf/Knight.glb",
+            props.model_path,
             (gltf : any) => {
                 gltf.scene.scale.set(0.5, 0.5, 0.5);
                 gltf.scene.position.set(0, 10, 0);
@@ -43,12 +47,10 @@ export default class Mob extends Component<MobProps> {
                 this.gltf = gltf.scene;
                 this.mixer = new THREE.AnimationMixer(this.gltf);
 
-                this.runAction = this.mixer.clipAction(gltf.animations[48]);
-                this.idleAction = this.mixer.clipAction(gltf.animations[36]);
+                this.idleAction = this.mixer.clipAction(gltf.animations[46]);
                 this.attackAction.push(this.mixer.clipAction(gltf.animations[0])); // from 0 to 3 are attack animations
                 this.attackAction.push(this.mixer.clipAction(gltf.animations[1]));
                 this.attackAction.push(this.mixer.clipAction(gltf.animations[2]));
-                // this.attackAction.push(this.mixer.clipAction(gltf.animations[3]));
                 this.attackAction.push(this.mixer.clipAction(gltf.animations[8]));
                 for (let i = 0; i < this.attackAction.length; i++) {
                     // this.attackAction[i].clampWhenFinished = true;
@@ -57,18 +59,10 @@ export default class Mob extends Component<MobProps> {
                 }
                 
 
-                // this.attackAction.play();
                 this.idleAction.timeScale = 3;
-                this.runAction.timeScale = 6;
-                // this.runAction.play();
                 this.idleAction.play();
 
-                const helmet = (gltf.scene.children[0].children[3] as THREE.SkinnedMesh).skeleton.bones[14].children[0];
-                helmet.rotation.x = 1;
-                helmet.parent?.remove(helmet);
-
                 // hp bar
-                // const geometry = new THREE.PlaneGeometry(1, 0.1); needs to be proportional to the hp
                 const geometry = new THREE.PlaneGeometry(1 * this.hp / 100, 0.1);
                 const material = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
                 const plane = new THREE.Mesh(geometry, material);
@@ -80,6 +74,7 @@ export default class Mob extends Component<MobProps> {
     }
 
     mobCollisions() {
+        if (!this.gltf) return;
 
         const result = this.props.scene.worldOctree.capsuleIntersect( this.mobCollider );
 
@@ -102,6 +97,7 @@ export default class Mob extends Component<MobProps> {
     }
 
     mobSphereCollision( sphere : any ) {
+        if (!this.gltf) return;
 
         const center = Sphere.vector1.addVectors( this.mobCollider.start, this.mobCollider.end ).multiplyScalar( 0.5 );
 
@@ -149,26 +145,40 @@ export default class Mob extends Component<MobProps> {
     killMob() {
         if (this.gltf) {
             this.props.scene.scene.remove(this.gltf);
+            this.props.scene.mobs.splice(this.props.scene.mobs.findIndex((mob : any) => mob.id === this.id), 1);
         }
         if (!this.isDead) {
             // spawn objects around the mob
-            const center = this.gltf.position.clone();
+            const center = this.gltf?.position.clone();
             const radius = 1;
-            const numObjects = 3;
+            const numObjects = 5;
             for (let i = 0; i < numObjects; i++) {
                 const angle = (i / numObjects) * Math.PI * 2;
                 const x = center.x + radius * Math.cos(angle);
                 const z = center.z + radius * Math.sin(angle);
                 // initial outwards velocity
                 const vel = new THREE.Vector3(x - center.x, 0, z - center.z).normalize().multiplyScalar(10);
-                this.props.scene.loadSphere( 'torch.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                // this.props.scene.loadSphere( 'torch.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                if (i < 3) {
+                    this.props.scene.loadSphere( 'coin.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel, true );
+                }
+                else {
+                    this.props.scene.loadSphere( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                }
+                // else {
+                //     this.props.scene.loadSphere( this.props.model_path, 0.2, new THREE.Vector3(x, center.y, z), vel );
+                // }
             }
             this.isDead = true;
+            this.mixer.stopAllAction();
+            this.gltf = null;
         }
     }
 
     
     updateMob( deltaTime : number ) {
+        if (!this.gltf) return;
+
         const player = this.props.scene.player;
         const playerPos = player.playerCollider.start.clone().add(player.playerCollider.end).multiplyScalar(0.5);
 
@@ -206,9 +216,13 @@ export default class Mob extends Component<MobProps> {
 
         this.mobCollisions();
 
+        if (this.mixer) {
+            this.mixer.update(deltaTime);
+        }
     }
 
     teleportMobIfOob() {
+        if (!this.gltf) return;
 
         if ( this.mobCollider.end.y <= - 25 ) {
 

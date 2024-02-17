@@ -52,7 +52,7 @@ export default class Sphere extends Component<SphereProps> {
 
     }
 
-    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player, mob : Mob ) {
+    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player, mobs : Mob[] ) {
         scene.spheres.forEach( ( sphere : any)  => {
 
             sphere.collider.center.addScaledVector( sphere.velocity, deltaTime );
@@ -76,7 +76,7 @@ export default class Sphere extends Component<SphereProps> {
 
             // léger effet de rotation
             sphere.mesh.rotation.y += 1 * deltaTime;
-            mob.mobSphereCollision( sphere );
+            mobs.forEach( ( mob : any ) => mob.mobSphereCollision( sphere ) );
             scene.playerSphereCollision( sphere );
 
         } );

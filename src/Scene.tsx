@@ -18,6 +18,7 @@ export default class Scene extends Component<SceneProps> {
     public scene = new THREE.Scene();
     public player : any;
     public spheres : any[] = [];
+    public mobs : any[] = [];
     public worldOctree = new Octree();
     public camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
     public renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -104,13 +105,14 @@ export default class Scene extends Component<SceneProps> {
         console.log("loading " + path_ + " with radius " + r_ + " at position " + pos.x + " " + pos.y + " " + pos.z);
         this.loader.load( path_, ( gltf ) => {
             // difference between coin and others items
-            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true, pos, vel);
-            } else { this.createSphere(gltf, r_, false, pos, vel); }
+            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true, false, pos, vel);
+            } else { this.createSphere(gltf, r_, false, path_.search("Skeleton") != -1, pos, vel); }
         } );
     }
 
-    createSphere(gltf: any, r_: number, isCoin: boolean, pos: THREE.Vector3, vel: THREE.Vector3) {
-        const model_ = gltf.scene.clone();
+    createSphere(gltf: any, r_: number, isCoin: boolean, isHat: boolean , pos: THREE.Vector3, vel: THREE.Vector3) {
+        const model_ = isHat ? (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone() : gltf.scene.clone();
+
         model_.castShadow = true;
         model_.receiveShadow = true;
         model_.name = "sphere_number_" + this.compteur_sphere;

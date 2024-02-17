@@ -68,7 +68,7 @@ export default class Player extends Component<PlayerProps> {
 
         }
 
-        if ( this.playerOnFloor ) { if ( this.keyStates[ 'Space' ] ) { this.playerVelocity.y = 15; } }
+        if ( this.playerOnFloor ) { if ( this.keyStates[ 'Space' ] ) { this.playerVelocity.y = 5; } }
 
     }
 
