@@ -24,6 +24,9 @@ export default class Scene extends Component<SceneProps> {
     public loader = new GLTFLoader().setPath( './models/gltf/' );
 
     public model_coin: any;
+    public model_warrior_skeleton: any;
+    public model_mage_skeleton: any;
+    public model_rogue_skeleton: any;
 
     constructor( props : SceneProps ) {
         super( props );
@@ -57,7 +60,7 @@ export default class Scene extends Component<SceneProps> {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.container?.appendChild( this.renderer.domElement );
 
-        const NUM_SPHERES = 600;
+        const NUM_SPHERES = 2;
         const SPHERE_RADIUS = 0.2;
 
         const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
@@ -84,30 +87,57 @@ export default class Scene extends Component<SceneProps> {
 
             }
         } );
-
-        const textureLoader = new THREE.TextureLoader();
         
-        
-        // load skeleton
-        this.loader.load( 'Skeleton_Warrior.glb', ( gltf ) => {
+        // load warrior skeleton
+        this.loader.load('Skeleton_Warrior.glb', ( gltf ) => {
             for ( let i = 0; i < 2; i ++ ) {
-                const coin_model = gltf.scene.clone();
-                coin_model.castShadow = true;
-                coin_model.receiveShadow = true;
-                textureLoader.load( 'models/gltf/skeleton_texture.png', ( texture ) => {
-                    coin_model.traverse( function ( child ) {
-                        if ( child.isMesh ) {
-                            child.material.map = texture;
-                        }
-                    } );
-                }
-                );
+                const model_warrior_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
+                model_warrior_skeleton.castShadow = true;
+                model_warrior_skeleton.receiveShadow = true;
                 
-                coin_model.position.set( 0, - 100, 0 );
-                this.scene.add( coin_model );
+                model_warrior_skeleton.position.set( 0, - 100, 0 );
+                this.scene.add( model_warrior_skeleton );
 
                 this.spheres.push( {
-                    mesh: coin_model,
+                    mesh: model_warrior_skeleton,
+                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
+                    velocity: new THREE.Vector3()
+                } );
+
+            }
+        } );
+
+        // load mage skeleton
+        this.loader.load('Skeleton_Mage.glb', ( gltf ) => {
+            for ( let i = 0; i < 2; i ++ ) {
+                const model_mage_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
+                model_mage_skeleton.castShadow = true;
+                model_mage_skeleton.receiveShadow = true;
+                
+                model_mage_skeleton.position.set( 0, - 100, 0 );
+                this.scene.add( model_mage_skeleton );
+
+                this.spheres.push( {
+                    mesh: model_mage_skeleton,
+                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
+                    velocity: new THREE.Vector3()
+                } );
+
+            }
+        } );
+
+        // load rogue skeleton
+        this.loader.load('Skeleton_Rogue.glb', ( gltf ) => {
+            for ( let i = 0; i < 2; i ++ ) {
+                const model_rogue_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
+                model_rogue_skeleton.castShadow = true;
+                model_rogue_skeleton.receiveShadow = true;
+                
+                model_rogue_skeleton.position.set( 0, - 100, 0 );
+                this.scene.add( model_rogue_skeleton );
+
+                this.spheres.push( {
+                    mesh: model_rogue_skeleton,
                     collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
                     velocity: new THREE.Vector3()
                 } );

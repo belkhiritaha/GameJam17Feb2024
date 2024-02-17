@@ -1,6 +1,7 @@
 import { Component } from "react";
 import * as THREE from "three";
 import Player from "./Player";
+import Mob from "./Mob";
 
 interface SphereProps {
 }
@@ -50,7 +51,7 @@ export default class Sphere extends Component<SphereProps> {
 
     }
 
-    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player ) {
+    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player, mob : Mob ) {
 
         scene.spheres.forEach( ( sphere : any)  => {
 
@@ -73,6 +74,7 @@ export default class Sphere extends Component<SphereProps> {
             sphere.velocity.addScaledVector( sphere.velocity, damping );
 
             player.playerSphereCollision( sphere );
+            mob.mobSphereCollision( sphere );
 
         } );
 

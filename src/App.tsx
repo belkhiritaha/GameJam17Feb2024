@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import Player from './Player';
 import Scene from './Scene';
 import Sphere from './Sphere';
+import Mob from './Mob';
 
 function App() {
     let mouseTime = 0;
@@ -14,6 +15,8 @@ function App() {
     const scene = new Scene( {} );
     const player = new Player( { gravity: 30, scene, mouseTime } );
     scene.player = player;
+
+    const mob = new Mob( { gravity: 100, scene } );
 
     document.addEventListener( 'keydown', ( event ) => {
 
@@ -65,9 +68,11 @@ function App() {
 
             player.updatePlayer( deltaTime );
 
-            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, player );
+            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, player, mob );
 
             player.teleportPlayerIfOob();
+
+            mob.updateMob(deltaTime);
 
         }
 
