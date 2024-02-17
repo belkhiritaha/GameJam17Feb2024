@@ -16,6 +16,7 @@ export default class Mob extends Component<MobProps> {
     public keyStates : any = {};
     public mobCollider = new Capsule( new THREE.Vector3( 0, 5.35, 0 ), new THREE.Vector3( 0, 6, 0 ), 0.35 );
     public sphereIdx = 0;
+    public isDead = false;
 
     public gltf : any;
     public mixer : any;
@@ -136,7 +137,7 @@ export default class Mob extends Component<MobProps> {
                 }
 
                 // if mob is dead
-                if (this.hp <= 0) {
+                if (this.hp <= 0 && !this.isDead) {
                     this.killMob();
                 }
             }
@@ -146,7 +147,24 @@ export default class Mob extends Component<MobProps> {
     }
 
     killMob() {
-        this.props.scene.scene.remove(this.gltf);
+        if (this.gltf) {
+            this.props.scene.scene.remove(this.gltf);
+        }
+        if (!this.isDead) {
+            // spawn objects around the mob
+            const center = this.gltf.position.clone();
+            const radius = 1;
+            const numObjects = 3;
+            for (let i = 0; i < numObjects; i++) {
+                const angle = (i / numObjects) * Math.PI * 2;
+                const x = center.x + radius * Math.cos(angle);
+                const z = center.z + radius * Math.sin(angle);
+                // initial outwards velocity
+                const vel = new THREE.Vector3(x - center.x, 0, z - center.z).normalize().multiplyScalar(10);
+                this.props.scene.loadSphere( 'torch.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+            }
+            this.isDead = true;
+        }
     }
 
     

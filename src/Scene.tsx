@@ -100,30 +100,31 @@ export default class Scene extends Component<SceneProps> {
 
     // path: chemin vers le fichier
     // r_: rayon du modèle (pour les collisions)
-    loadSphere( path_: string, r_: number ) {
+    loadSphere( path_: string, r_: number, pos: THREE.Vector3 = new THREE.Vector3(0, -100, 0), vel: THREE.Vector3 = new THREE.Vector3(0, 0, 0) ) {
+        console.log("loading " + path_ + " with radius " + r_ + " at position " + pos.x + " " + pos.y + " " + pos.z);
         this.loader.load( path_, ( gltf ) => {
             // difference between coin and others items
-            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true);
-            } else { this.createSphere(gltf, r_, false); }
+            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true, pos, vel);
+            } else { this.createSphere(gltf, r_, false, pos, vel); }
         } );
     }
 
-    createSphere(gltf: any, r_: number, isCoin: boolean) {
+    createSphere(gltf: any, r_: number, isCoin: boolean, pos: THREE.Vector3, vel: THREE.Vector3) {
         const model_ = gltf.scene.clone();
         model_.castShadow = true;
         model_.receiveShadow = true;
         model_.name = "sphere_number_" + this.compteur_sphere;
         console.log(model_.name);
-
-        model_.position.set( 0, -100, 0 );
+        
+        model_.position.set( pos.x, pos.y, pos.z );
         this.scene.add( model_ );
 
         this.spheres.push( {
             id: "sphere_number_" + this.compteur_sphere,
             isCoin: isCoin,
             mesh: model_,
-            collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
-            velocity: new THREE.Vector3()
+            collider: new THREE.Sphere( pos, r_ ),
+            velocity: vel
         } );
 
         this.compteur_sphere += 1;
