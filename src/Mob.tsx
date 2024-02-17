@@ -15,7 +15,6 @@ export default class Mob extends Component<MobProps> {
     public mobOnFloor = false;
     public keyStates : any = {};
     public mobCollider = new Capsule( new THREE.Vector3( 0, 5.35, 0 ), new THREE.Vector3( 0, 6, 0 ), 0.35 );
-    public sphereIdx = 0;
 
     public gltf : any;
     public mixer : any;
@@ -54,7 +53,7 @@ export default class Mob extends Component<MobProps> {
                     this.attackAction[i].loop = THREE.LoopOnce;
                     this.attackAction[i].timeScale = 15;
                 }
-                
+
 
                 // this.attackAction.play();
                 this.idleAction.timeScale = 3;
@@ -149,7 +148,7 @@ export default class Mob extends Component<MobProps> {
         this.props.scene.scene.remove(this.gltf);
     }
 
-    
+
     updateMob( deltaTime : number ) {
         const player = this.props.scene.player;
         const playerPos = player.playerCollider.start.clone().add(player.playerCollider.end).multiplyScalar(0.5);

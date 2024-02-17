@@ -66,7 +66,7 @@ function App() {
 
             player.updatePlayer( deltaTime );
 
-            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, player, mob );
+            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, mob );
 
             player.teleportPlayerIfOob();
 

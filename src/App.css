@@ -46,13 +46,25 @@
   color: #888;
 }
 
-#info {
+#inventaire {
   font-family: myFirstFont;
-  font-size: 100px;
+  font-size: 50px;
 	position: absolute;
-	top: 10px;
+	top: 0px;
+  left: 10px;
 	width: 100%;
-	text-align: center;
+	z-index: 100;
+	display:block;
+}
+
+p { margin: 0; }
+
+#viseur {
+  font-family: myFirstFont;
+  font-size: 50px;
+	position: absolute;
+  text-align: center;
+	width: 100%;
 	z-index: 100;
 	display:block;
 }
