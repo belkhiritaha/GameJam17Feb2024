@@ -16,7 +16,7 @@ export default class Player extends Component<PlayerProps> {
     public playerCollider = new Capsule( new THREE.Vector3( 0, 0.35, 0 ), new THREE.Vector3( 0, 1, 0 ), 0.35 );
     public sphereIdx = 0;
 
-    public ammo = 300;
+    public ammo = 6;
 
     constructor( props : PlayerProps ) {
         super( props );

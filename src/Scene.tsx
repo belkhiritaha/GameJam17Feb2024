@@ -66,7 +66,7 @@ export default class Scene extends Component<SceneProps> {
         this.loadMap();
 
         // load models
-        for(let i=0; i<100; i++) {
+        for(let i=0; i<2; i++) {
             this.loadSphere( 'coin.gltf.glb', SPHERE_RADIUS );
             this.loadSphere( 'torch.gltf.glb', SPHERE_RADIUS );
             this.loadSphere( 'key.gltf.glb', SPHERE_RADIUS );
@@ -100,11 +100,13 @@ export default class Scene extends Component<SceneProps> {
     // r_: rayon du modèle (pour les collisions)
     loadSphere( path_: string, r_: number ) {
         this.loader.load( path_, ( gltf ) => {
-            this.createSphere(gltf, r_);
+            // difference between coin and others items
+            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true);
+            } else { this.createSphere(gltf, r_, false); }
         } );
     }
 
-    createSphere(gltf: any, r_: number) {
+    createSphere(gltf: any, r_: number, isCoin: boolean) {
         const model_ = gltf.scene.clone();
         model_.castShadow = true;
         model_.receiveShadow = true;
@@ -116,6 +118,7 @@ export default class Scene extends Component<SceneProps> {
 
         this.spheres.push( {
             id: "sphere_number_" + this.compteur_sphere,
+            isCoin: isCoin,
             mesh: model_,
             collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
             velocity: new THREE.Vector3()
@@ -153,20 +156,22 @@ export default class Scene extends Component<SceneProps> {
                 const d = ( r - Math.sqrt( d2 ) ) / 2;
                 sphere_center.addScaledVector( normal, - d );
 
-                // remove object..
-                let selectedName = sphere.mesh.name;
-                let selectedObject = this.scene.getObjectByName( selectedName );
-                // ..from the list of spheres
-                this.spheres.splice(this.spheres.findIndex(function(i){
-                    return i.id === selectedName;
-                }), 1);
-                // ..from the scene
-                this.scene.remove( selectedObject! );
+                if(sphere.isCoin) {
+                    // remove object..
+                    let selectedName = sphere.mesh.name;
+                    let selectedObject = this.scene.getObjectByName( selectedName );
+                    // ..from the list of spheres
+                    this.spheres.splice(this.spheres.findIndex(function(i){
+                        return i.id === selectedName;
+                    }), 1);
+                    // ..from the scene
+                    this.scene.remove( selectedObject! );
 
+                    // add new munitions
+                    this.player.ammo += 1;
+                    this.loadSphere( 'torch.gltf.glb', 0.2 );
+                }
 
-                // add new munitions
-                this.player.ammo += 1;
-                this.loadSphere( 'coin.gltf.glb', 0.2 );
 
             }
         }
