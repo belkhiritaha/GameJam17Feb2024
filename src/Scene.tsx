@@ -77,13 +77,13 @@ export default class Scene extends Component<SceneProps> {
 
         // load 5 coins
         for(let i=0; i<5; i++) {
-            this.loadCoin();
+            this.loadCoin( new THREE.Vector3( Math.random() * 20, 5, Math.random() * 20 ), new THREE.Vector3(0, 0, 0), true );
         }
         // and 4 others
-        this.loadOthers( 'torch.gltf.glb', SPHERE_RADIUS );
-        this.loadOthers( 'chair.gltf.glb', SPHERE_RADIUS );
-        this.loadOthers( 'key.gltf.glb', SPHERE_RADIUS );
-        this.loadOthers( 'plate.gltf.glb', SPHERE_RADIUS );
+        this.loadOthers( 'torch.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( 'chair.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( 'key.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( 'plate.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
         //this.compteur_others += 4;
         //this.player.ammo_others += 4;
     }
@@ -111,7 +111,7 @@ export default class Scene extends Component<SceneProps> {
     // path: chemin vers le fichier
     // r_: rayon du modèle (pour les collisions)
 
-    loadCoin(position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+    loadCoin(position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0), onGround: boolean = true) {
         this.loader.load( 'coin.gltf.glb', ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
@@ -124,18 +124,19 @@ export default class Scene extends Component<SceneProps> {
             this.list_coins.push( {
                 id: "coin_number_" + this.compteur_coins,
                 isCoin: true,
+                isOnGround: onGround,
                 mesh: model_,
                 collider: new THREE.Sphere( position , 0.2 ),
                 velocity: velocity
             } );
             this.compteur_coins += 1;
-            this.player.ammo_coin += 1;
+            // this.player.ammo_coin += 1;
         } );
 
 
     }
 
-    loadOthers( path_: string, r_: number, position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+    loadOthers( path_: string, r_: number, position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0), onGround: boolean = true) {
         this.loader.load( path_, ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
@@ -148,6 +149,7 @@ export default class Scene extends Component<SceneProps> {
             this.list_others.push( {
                 id: "others_number_" + this.compteur_others,
                 isCoin: false,
+                isOnGround: onGround,
                 mesh: model_,
                 collider: new THREE.Sphere( position, r_ ),
                 velocity: velocity
@@ -191,16 +193,20 @@ export default class Scene extends Component<SceneProps> {
                     // remove object..
                     let selectedName = sphere.mesh.name;
                     let selectedObject = this.scene.getObjectByName( selectedName );
+                    // move to 0 -100 0
+                    sphere.collider.center.set(0, -100, 0);
+                    // set as not on ground
+                    sphere.isOnGround = false;
                     // ..from the list of list_coins
-                    this.list_coins.splice(this.list_coins.findIndex(function(i){
-                        return i.id === selectedName;
-                    }), 1);
+                    // this.list_coins.splice(this.list_coins.findIndex(function(i){
+                    //     return i.id === selectedName;
+                    // }), 1);
                     // ..from the scene
-                    this.scene.remove( selectedObject! );
+                    // this.scene.remove( selectedObject! );
 
                     // and add new coin
-                    this.player.list_coins_index -= 1;
-                    this.loadCoin();
+                    // this.player.list_coins_index -= 1;
+                    // this.loadCoin(new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false);
                 }
 
             }

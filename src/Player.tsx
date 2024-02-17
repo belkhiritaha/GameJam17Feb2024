@@ -15,11 +15,6 @@ export default class Player extends Component<PlayerProps> {
     public keyStates : any = {};
     public playerCollider = new Capsule( new THREE.Vector3( 0, 0.35, 0 ), new THREE.Vector3( 0, 1, 0 ), 0.35 );
 
-    public ammo_coin = 0;
-    public ammo_others = 0;
-    public list_coins_index = 0;
-    public list_others_index = 0;
-
     constructor( props : PlayerProps ) {
         super( props );
     }
@@ -93,29 +88,30 @@ export default class Player extends Component<PlayerProps> {
         const impulse = 15 + 30 * ( 1 - Math.exp( ( this.props.mouseTime - performance.now() ) * 0.001 ) );
 
         // throw others projectioal and after coin
-        if(this.ammo_others > 0){
+        if(this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null ).length > 0) {
             // throw something
-            const other = this.props.scene.list_others[ this.list_others_index ];
+            const other = this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null )[ 0 ];
 
             other.collider.center.copy( this.playerCollider.end ).addScaledVector( this.playerDirection, this.playerCollider.radius * 2.0 );
 
             other.velocity.copy( this.playerDirection ).multiplyScalar( impulse );
             other.velocity.addScaledVector( this.playerVelocity, 2 );
 
-            this.ammo_others -= 1;
-            this.list_others_index += 1;
+            // make it on ground
+            other.isOnGround = true;
+
         } else {
-            if(this.ammo_coin > 0) {
+            if(this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length > 0) {
                 // throw coin
-                const coin = this.props.scene.list_coins[ this.list_coins_index ];
+                const coin = this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null )[ 0 ];
 
                 coin.collider.center.copy( this.playerCollider.end ).addScaledVector( this.playerDirection, this.playerCollider.radius * 2.0 );
 
                 coin.velocity.copy( this.playerDirection ).multiplyScalar( impulse );
                 coin.velocity.addScaledVector( this.playerVelocity, 2 );
 
-                this.ammo_coin -= 1;
-                this.list_coins_index += 1;
+                // make it on ground
+                coin.isOnGround = true;
             }
         }
     }
@@ -155,9 +151,7 @@ export default class Player extends Component<PlayerProps> {
 
         this.props.scene.camera.position.copy( this.playerCollider.end );
 
-        // update
-        document.getElementById('pieces_restantes')!.innerHTML = "" + this.ammo_coin;
-        document.getElementById('autres_objets_restants')!.innerHTML = "" + this.ammo_others;
-
+        document.getElementById('pieces_restantes')!.innerHTML = "" + this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length;
+        document.getElementById('autres_objets_restants')!.innerHTML = "" + this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null ).length;
     }
 }

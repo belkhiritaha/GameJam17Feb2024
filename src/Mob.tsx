@@ -158,10 +158,10 @@ export default class Mob extends Component<MobProps> {
                 // initial outwards velocity
                 const vel = new THREE.Vector3(x - center.x, 0, z - center.z).normalize().multiplyScalar(10);
                 if (i < 3) {
-                    this.props.scene.loadCoin( new THREE.Vector3(x, center.y, z), vel );
+                    this.props.scene.loadCoin( new THREE.Vector3(x, center.y, z), vel, true );
                 }
                 else {
-                    this.props.scene.loadOthers( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                    this.props.scene.loadOthers( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel, true );
                     //this.props.scene.compteur_others += 1; todo
                 }
 
