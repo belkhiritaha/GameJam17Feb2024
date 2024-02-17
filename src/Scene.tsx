@@ -57,48 +57,67 @@ export default class Scene extends Component<SceneProps> {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.container?.appendChild( this.renderer.domElement );
 
-        const NUM_SPHERES = 100;
+        const NUM_SPHERES = 600;
         const SPHERE_RADIUS = 0.2;
 
-        const sphereGeometry = new THREE.IcosahedronGeometry( SPHERE_RADIUS, 5 );
         const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
 
-        // load map & objects
-        this.loadModels();
+        // load map
+        this.loadMap();
 
-        // load coin
+        // load coins
         this.loader.load( 'coin.gltf.glb', ( gltf ) => {
-
+            console.log(gltf.scene);
             for ( let i = 0; i < NUM_SPHERES; i ++ ) {
+                const coin_model = gltf.scene.clone();
+                coin_model.castShadow = true;
+                coin_model.receiveShadow = true;
 
-                const sphere = new THREE.Mesh( gltf.scene, sphereMaterial );
-                sphere.castShadow = true;
-                sphere.receiveShadow = true;
-
-                this.scene.add( sphere );
+                coin_model.position.set( 0, - 100, 0 );
+                this.scene.add( coin_model );
 
                 this.spheres.push( {
-                    mesh: sphere,
+                    mesh: coin_model,
                     collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
                     velocity: new THREE.Vector3()
                 } );
 
             }
+        } );
 
-            //this.scene.add( gltf.scene );
-            /*this.model_coin = gltf.scene;
-            gltf.scene.name = 'coin';
-            gltf.scene.traverse( child => {
-                if ( child.isMesh ) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+        const textureLoader = new THREE.TextureLoader();
+        
+        
+        // load skeleton
+        this.loader.load( 'Skeleton_Warrior.glb', ( gltf ) => {
+            for ( let i = 0; i < 2; i ++ ) {
+                const coin_model = gltf.scene.clone();
+                coin_model.castShadow = true;
+                coin_model.receiveShadow = true;
+                textureLoader.load( 'models/gltf/skeleton_texture.png', ( texture ) => {
+                    coin_model.traverse( function ( child ) {
+                        if ( child.isMesh ) {
+                            child.material.map = texture;
+                        }
+                    } );
                 }
-            } );*/
+                );
+                
+                coin_model.position.set( 0, - 100, 0 );
+                this.scene.add( coin_model );
+
+                this.spheres.push( {
+                    mesh: coin_model,
+                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
+                    velocity: new THREE.Vector3()
+                } );
+
+            }
         } );
 
     }
 
-    loadModels(){
+    loadMap(){
 
 
         // load world
