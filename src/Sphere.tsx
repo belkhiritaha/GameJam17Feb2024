@@ -1,5 +1,8 @@
 import { Component } from "react";
 import * as THREE from "three";
+import Player from "./Player";
+import Mob from "./Mob";
+
 
 interface SphereProps {
 }
@@ -49,8 +52,7 @@ export default class Sphere extends Component<SphereProps> {
 
     }
 
-    static updateSpheres( scene : any, deltaTime : number, gravity : number) {
-
+    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player, mob : Mob ) {
         scene.spheres.forEach( ( sphere : any)  => {
 
             sphere.collider.center.addScaledVector( sphere.velocity, deltaTime );
@@ -71,9 +73,10 @@ export default class Sphere extends Component<SphereProps> {
             const damping = Math.exp( - 1.5 * deltaTime ) - 1;
             sphere.velocity.addScaledVector( sphere.velocity, damping );
 
+
             // léger effet de rotation
             sphere.mesh.rotation.y += 1 * deltaTime;
-
+            mob.mobSphereCollision( sphere );
             scene.playerSphereCollision( sphere );
 
         } );

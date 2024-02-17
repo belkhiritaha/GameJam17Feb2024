@@ -124,7 +124,6 @@ export default class Player extends Component<PlayerProps> {
     }
 
     updatePlayer( deltaTime : number ) {
-
         let damping = Math.exp( - 4 * deltaTime ) - 1;
 
         if ( ! this.playerOnFloor ) {

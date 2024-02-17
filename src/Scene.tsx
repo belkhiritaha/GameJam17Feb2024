@@ -26,6 +26,9 @@ export default class Scene extends Component<SceneProps> {
     public loader = new GLTFLoader().setPath( './models/gltf/' );
 
     public model_coin: any;
+    public model_warrior_skeleton: any;
+    public model_mage_skeleton: any;
+    public model_rogue_skeleton: any;
 
     constructor( props : SceneProps ) {
         super( props );
@@ -77,7 +80,6 @@ export default class Scene extends Component<SceneProps> {
 
     loadMap(){
         this.loader.load( 'collision-world.glb', ( gltf ) => {
-
             this.scene.add( gltf.scene );
             this.worldOctree.fromGraphNode( gltf.scene );
 
