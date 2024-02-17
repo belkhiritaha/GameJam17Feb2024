@@ -1,5 +1,3 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import * as THREE from 'three';
 
@@ -65,7 +63,7 @@ function App() {
 
             player.updatePlayer( deltaTime );
 
-            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, player );
+            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY );
 
             player.teleportPlayerIfOob();
 
@@ -92,7 +90,7 @@ function App() {
     }
     */
 
-  return ( <></> )
+  return ( <> </> )
 }
 
 export default App

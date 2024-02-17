@@ -57,74 +57,22 @@ export default class Scene extends Component<SceneProps> {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.container?.appendChild( this.renderer.domElement );
 
-        const NUM_SPHERES = 600;
-        const SPHERE_RADIUS = 0.2;
-
-        const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
+        const SPHERE_RADIUS = 0.3;
 
         // load map
         this.loadMap();
 
-        // load coins
-        this.loader.load( 'coin.gltf.glb', ( gltf ) => {
-            console.log(gltf.scene);
-            for ( let i = 0; i < NUM_SPHERES; i ++ ) {
-                const coin_model = gltf.scene.clone();
-                coin_model.castShadow = true;
-                coin_model.receiveShadow = true;
-
-                coin_model.position.set( 0, - 100, 0 );
-                this.scene.add( coin_model );
-
-                this.spheres.push( {
-                    mesh: coin_model,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
-
-        const textureLoader = new THREE.TextureLoader();
-        
-        
-        // load skeleton
-        this.loader.load( 'Skeleton_Warrior.glb', ( gltf ) => {
-            for ( let i = 0; i < 2; i ++ ) {
-                const coin_model = gltf.scene.clone();
-                coin_model.castShadow = true;
-                coin_model.receiveShadow = true;
-                textureLoader.load( 'models/gltf/skeleton_texture.png', ( texture ) => {
-                    coin_model.traverse( function ( child ) {
-                        if ( child.isMesh ) {
-                            child.material.map = texture;
-                        }
-                    } );
-                }
-                );
-                
-                coin_model.position.set( 0, - 100, 0 );
-                this.scene.add( coin_model );
-
-                this.spheres.push( {
-                    mesh: coin_model,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
-
+        // load models
+        this.loadSphere( 'coin.gltf.glb', 5, SPHERE_RADIUS );
+        this.loadSphere( 'torch.gltf.glb', 5, SPHERE_RADIUS );
+        this.loadSphere( 'key.gltf.glb', 5, SPHERE_RADIUS );
+        this.loadSphere( 'chair.gltf.glb', 5, SPHERE_RADIUS );
     }
 
     loadMap(){
-
-
-        // load world
         this.loader.load( 'collision-world.glb', ( gltf ) => {
 
             this.scene.add( gltf.scene );
-
             this.worldOctree.fromGraphNode( gltf.scene );
 
             gltf.scene.traverse( child => {
@@ -134,16 +82,82 @@ export default class Scene extends Component<SceneProps> {
                     child.castShadow = true;
                     child.receiveShadow = true;
 
-                    if ( child.material.map ) {
-
-                        child.material.map.anisotropy = 4;
-
-                    }
+                    if ( child.material.map ) { child.material.map.anisotropy = 4; }
 
                 }
 
             } );
         } );
+    }
+
+    // path: chemin vers le fichier
+    // n_: nombre de models à générer
+    // r_: rayon du modèle (pour les collisions)
+    loadSphere( path_: string, n_: number, r_: number ) {
+        this.loader.load( path_, ( gltf ) => {
+            for ( let i = 0; i < n_; i ++ ) {
+                const model_ = gltf.scene.clone();
+                model_.castShadow = true;
+                model_.receiveShadow = true;
+                model_.name = "name_" + path_ + "_" + i;
+
+                model_.position.set( 0, -100, 0 );
+                this.scene.add( model_ );
+
+                this.spheres.push( {
+                    id: "name_" + path_ + "_" + i,
+                    mesh: model_,
+                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
+                    velocity: new THREE.Vector3()
+                } );
+
+            }
+        } );
+    }
+
+    // with objects
+    playerSphereCollision( sphere : any ) {
+
+        const center = Sphere.vector1.addVectors( this.player.playerCollider.start, this.player.playerCollider.end ).multiplyScalar( 0.5 );
+
+        const sphere_center = sphere.collider.center;
+
+        const r = this.player.playerCollider.radius + sphere.collider.radius;
+        const r2 = r * r;
+
+        // approximation: player = 3 spheres
+
+        for ( const point of [ this.player.playerCollider.start, this.player.playerCollider.end, center ] ) {
+
+            const d2 = point.distanceToSquared( sphere_center );
+
+            if ( d2 < r2 ) {
+
+                // effet de recul
+                const normal = Sphere.vector1.subVectors( point, sphere_center ).normalize();
+                const v1 = Sphere.vector2.copy( normal ).multiplyScalar( normal.dot( this.player.playerVelocity ) );
+                const v2 = Sphere.vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
+
+                this.player.playerVelocity.add( v2 ).sub( v1 );
+                sphere.velocity.add( v1 ).sub( v2 );
+
+                const d = ( r - Math.sqrt( d2 ) ) / 2;
+                sphere_center.addScaledVector( normal, - d );
+
+                // remove object..
+                let selectedName = sphere.mesh.name;
+                let selectedObject = this.scene.getObjectByName( selectedName );
+                // ..from the scene
+                this.scene.remove( selectedObject! );
+                // ..from the list of spheres
+                this.spheres.splice(this.spheres.findIndex(function(i){
+                    return i.id === selectedName;
+                }), 1);
+
+                // add new munitions
+                //this.player.ammo += 1;
+            }
+        }
     }
 
 }
