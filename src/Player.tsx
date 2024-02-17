@@ -14,9 +14,11 @@ export default class Player extends Component<PlayerProps> {
     public playerOnFloor = false;
     public keyStates : any = {};
     public playerCollider = new Capsule( new THREE.Vector3( 0, 0.35, 0 ), new THREE.Vector3( 0, 1, 0 ), 0.35 );
-    public sphereIdx = 0;
 
-    public ammo = 6;
+    public ammo_coin = 0;
+    public ammo_others = 0;
+    public list_coins_index = 0;
+    public list_others_index = 0;
 
     constructor( props : PlayerProps ) {
         super( props );
@@ -87,26 +89,35 @@ export default class Player extends Component<PlayerProps> {
 
     //
     throwBall() {
+        this.props.scene.camera.getWorldDirection( this.playerDirection );
+        const impulse = 15 + 30 * ( 1 - Math.exp( ( this.props.mouseTime - performance.now() ) * 0.001 ) );
 
-        if( this.ammo > 0 ) {
-            const sphere = this.props.scene.spheres[ this.sphereIdx ];
+        // throw others projectioal and after coin
+        if(this.ammo_others > 0){
+            // throw something
+            const other = this.props.scene.list_others[ this.list_others_index ];
 
-            this.props.scene.camera.getWorldDirection( this.playerDirection );
+            other.collider.center.copy( this.playerCollider.end ).addScaledVector( this.playerDirection, this.playerCollider.radius * 2.0 );
 
-            sphere.collider.center.copy( this.playerCollider.end ).addScaledVector( this.playerDirection, this.playerCollider.radius * 2.0 );
+            other.velocity.copy( this.playerDirection ).multiplyScalar( impulse );
+            other.velocity.addScaledVector( this.playerVelocity, 2 );
 
-            // throw the ball with more force if we hold the button longer, and if we move forward
+            this.ammo_others -= 1;
+            this.list_others_index += 1;
+        } else {
+            if(this.ammo_coin > 0) {
+                // throw coin
+                const coin = this.props.scene.list_coins[ this.list_coins_index ];
 
-            const impulse = 15 + 30 * ( 1 - Math.exp( ( this.props.mouseTime - performance.now() ) * 0.001 ) );
+                coin.collider.center.copy( this.playerCollider.end ).addScaledVector( this.playerDirection, this.playerCollider.radius * 2.0 );
 
-            sphere.velocity.copy( this.playerDirection ).multiplyScalar( impulse );
-            sphere.velocity.addScaledVector( this.playerVelocity, 2 );
+                coin.velocity.copy( this.playerDirection ).multiplyScalar( impulse );
+                coin.velocity.addScaledVector( this.playerVelocity, 2 );
 
-            this.sphereIdx = ( this.sphereIdx + 1 ) % this.props.scene.spheres.length;
-
-            this.ammo -= 1;
+                this.ammo_coin -= 1;
+                this.list_coins_index += 1;
+            }
         }
-
     }
 
     teleportPlayerIfOob() {
@@ -145,7 +156,8 @@ export default class Player extends Component<PlayerProps> {
         this.props.scene.camera.position.copy( this.playerCollider.end );
 
         // update
-        document.getElementById('munitions_restantes')!.innerHTML = "" + this.ammo;
+        document.getElementById('pieces_restantes')!.innerHTML = "" + this.ammo_coin;
+        document.getElementById('autres_objets_restants')!.innerHTML = "" + this.ammo_others;
 
     }
 }

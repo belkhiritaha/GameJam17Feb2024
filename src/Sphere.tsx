@@ -16,15 +16,20 @@ export default class Sphere extends Component<SphereProps> {
     public material = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
     public mesh = new THREE.Mesh( this.geometry, this.material );
 
+
+
     static spheresCollisions( scene : any ) {
 
-        for ( let i = 0, length = scene.spheres.length; i < length; i ++ ) {
+        // concat between list of coins and list of others
+        let spheres = scene.list_coins.concat(scene.list_others);
 
-            const s1 = scene.spheres[ i ];
+        for ( let i = 0, length = spheres.length; i < length; i ++ ) {
+
+            const s1 = spheres[ i ];
 
             for ( let j = i + 1; j < length; j ++ ) {
 
-                const s2 = scene.spheres[ j ];
+                const s2 = spheres[ j ];
 
                 const d2 = s1.collider.center.distanceToSquared( s2.collider.center );
                 const r = s1.collider.radius + s2.collider.radius;
@@ -52,8 +57,11 @@ export default class Sphere extends Component<SphereProps> {
 
     }
 
-    static updateSpheres( scene : any, deltaTime : number, gravity : number, player : Player, mobs : Mob[] ) {
-        scene.spheres.forEach( ( sphere : any)  => {
+
+    static updateSpheres( scene : any, deltaTime : number, gravity : number, mobs : Mob[] ) {
+        // concat between list of coins and list of others
+        let spheres = scene.list_coins.concat(scene.list_others);
+        spheres.forEach( ( sphere : any)  => {
 
             sphere.collider.center.addScaledVector( sphere.velocity, deltaTime );
 
@@ -83,7 +91,7 @@ export default class Sphere extends Component<SphereProps> {
 
         Sphere.spheresCollisions( scene );
 
-        for ( const sphere of scene.spheres ) {
+        for ( const sphere of spheres ) {
 
             sphere.mesh.position.copy( sphere.collider.center );
 

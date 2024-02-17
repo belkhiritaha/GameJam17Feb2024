@@ -17,9 +17,8 @@ export default class Mob extends Component<MobProps> {
     public mobVelocity = new THREE.Vector3();
     public mobOnFloor = false;
     public keyStates : any = {};
+
     public mobCollider = new Capsule( this.props.position.clone(), this.props.position.clone().add(new THREE.Vector3(0, 1, 0)), 0.35 );
-    public sphereIdx = 0;
-    public isDead = false;
     public id: number;
 
     public gltf : any;
@@ -57,7 +56,7 @@ export default class Mob extends Component<MobProps> {
                     this.attackAction[i].loop = THREE.LoopOnce;
                     this.attackAction[i].timeScale = 15;
                 }
-                
+
 
                 this.idleAction.timeScale = 3;
                 this.idleAction.play();
@@ -175,7 +174,7 @@ export default class Mob extends Component<MobProps> {
         }
     }
 
-    
+
     updateMob( deltaTime : number ) {
         if (!this.gltf) return;
 

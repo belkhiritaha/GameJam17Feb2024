@@ -13,12 +13,17 @@ export default class Scene extends Component<SceneProps> {
     static GRAVITY = 30;
     static STEPS_PER_FRAME = 5;
 
-    public compteur_sphere;
+    public compteur_coins;
+    public compteur_others;
+
+    public list_coins : any[] = [];
+    public list_others : any[] = [];
 
     public scene = new THREE.Scene();
     public player : any;
-    public spheres : any[] = [];
+
     public mobs : any[] = [];
+
     public worldOctree = new Octree();
     public camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
     public renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -36,7 +41,8 @@ export default class Scene extends Component<SceneProps> {
         this.camera.rotation.order = 'YXZ';
         this.scene.background = new THREE.Color( 0x88ccee );
         this.scene.fog = new THREE.Fog( 0x88ccee, 0, 50 );
-        this.compteur_sphere = 0;
+        this.compteur_coins = 0;
+        this.compteur_others = 0;
 
         const fillLight1 = new THREE.HemisphereLight( 0x8dc1de, 0x00668d, 1.5 );
         fillLight1.position.set( 2, 1, 1 );
@@ -69,14 +75,15 @@ export default class Scene extends Component<SceneProps> {
         // load map
         this.loadMap();
 
-        // load models
-        for(let i=0; i<2; i++) {
-            this.loadSphere( 'coin.gltf.glb', SPHERE_RADIUS );
-            this.loadSphere( 'torch.gltf.glb', SPHERE_RADIUS );
-            this.loadSphere( 'key.gltf.glb', SPHERE_RADIUS );
-            this.loadSphere( 'chair.gltf.glb', SPHERE_RADIUS );
+        // load 5 coins
+        for(let i=0; i<5; i++) {
+            this.loadCoin();
         }
-
+        // and 4 others
+        this.loadOthers( 'torch.gltf.glb', SPHERE_RADIUS );
+        this.loadOthers( 'chair.gltf.glb', SPHERE_RADIUS );
+        this.loadOthers( 'key.gltf.glb', SPHERE_RADIUS );
+        this.loadOthers( 'plate.gltf.glb', SPHERE_RADIUS );
     }
 
     loadMap(){
@@ -101,35 +108,52 @@ export default class Scene extends Component<SceneProps> {
 
     // path: chemin vers le fichier
     // r_: rayon du modèle (pour les collisions)
-    loadSphere( path_: string, r_: number, pos: THREE.Vector3 = new THREE.Vector3(0, -100, 0), vel: THREE.Vector3 = new THREE.Vector3(0, 0, 0) ) {
-        console.log("loading " + path_ + " with radius " + r_ + " at position " + pos.x + " " + pos.y + " " + pos.z);
-        this.loader.load( path_, ( gltf ) => {
-            // difference between coin and others items
-            if (path_.search("coin") != -1) { this.createSphere(gltf, r_, true, false, pos, vel);
-            } else { this.createSphere(gltf, r_, false, path_.search("Skeleton") != -1, pos, vel); }
+
+    loadCoin() {
+        this.loader.load( 'coin.gltf.glb', ( gltf ) => {
+            const model_ = gltf.scene.clone();
+            model_.castShadow = true;
+            model_.receiveShadow = true;
+            model_.name = "coin_number_" + this.compteur_coins;
+
+            model_.position.set( 0, -100, 0 );
+            this.scene.add( model_ );
+
+            this.list_coins.push( {
+                id: "coin_number_" + this.compteur_coins,
+                isCoin: true,
+                mesh: model_,
+                collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), 0.2 ),
+                velocity: new THREE.Vector3()
+            } );
+            this.compteur_coins += 1;
+            this.player.ammo_coin += 1;
         } );
+
+
     }
 
-    createSphere(gltf: any, r_: number, isCoin: boolean, isHat: boolean , pos: THREE.Vector3, vel: THREE.Vector3) {
-        const model_ = isHat ? (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone() : gltf.scene.clone();
+    loadOthers( path_: string, r_: number ) {
+        this.loader.load( path_, ( gltf ) => {
+            const model_ = gltf.scene.clone();
+            model_.castShadow = true;
+            model_.receiveShadow = true;
+            model_.name = "others_number_" + this.compteur_others;
 
-        model_.castShadow = true;
-        model_.receiveShadow = true;
-        model_.name = "sphere_number_" + this.compteur_sphere;
-        console.log(model_.name);
-        
-        model_.position.set( pos.x, pos.y, pos.z );
-        this.scene.add( model_ );
+            model_.position.set( 0, -100, 0 );
+            this.scene.add( model_ );
 
-        this.spheres.push( {
-            id: "sphere_number_" + this.compteur_sphere,
-            isCoin: isCoin,
-            mesh: model_,
-            collider: new THREE.Sphere( pos, r_ ),
-            velocity: vel
+            this.list_others.push( {
+                id: "others_number_" + this.compteur_others,
+                isCoin: false,
+                mesh: model_,
+                collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
+                velocity: new THREE.Vector3()
+            } );
+
+            this.compteur_others += 1;
+            this.player.ammo_others += 1;
         } );
-
-        this.compteur_sphere += 1;
     }
 
     // with objects
@@ -161,22 +185,22 @@ export default class Scene extends Component<SceneProps> {
                 const d = ( r - Math.sqrt( d2 ) ) / 2;
                 sphere_center.addScaledVector( normal, - d );
 
+                // recup a coin
                 if(sphere.isCoin) {
                     // remove object..
                     let selectedName = sphere.mesh.name;
                     let selectedObject = this.scene.getObjectByName( selectedName );
-                    // ..from the list of spheres
-                    this.spheres.splice(this.spheres.findIndex(function(i){
+                    // ..from the list of list_coins
+                    this.list_coins.splice(this.list_coins.findIndex(function(i){
                         return i.id === selectedName;
                     }), 1);
                     // ..from the scene
                     this.scene.remove( selectedObject! );
 
-                    // add new munitions
-                    this.player.ammo += 1;
-                    this.loadSphere( 'torch.gltf.glb', 0.2 );
+                    // and add new coin
+                    this.player.list_coins_index -= 1;
+                    this.loadCoin();
                 }
-
 
             }
         }
