@@ -1,17 +1,7 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import * as THREE from 'three';
-
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-import { Octree } from 'three/addons/math/Octree.js';
-import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
-
-import { Capsule } from 'three/addons/math/Capsule.js';
-
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 import Player from './Player';
 import Scene from './Scene';
@@ -23,21 +13,7 @@ function App() {
 
     const scene = new Scene( {} );
     const player = new Player( { gravity: 30, scene, mouseTime } );
-
-    const container = document.getElementById( 'container' );
-
-    const renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.VSMShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    container?.appendChild( renderer.domElement );
-
-    const GRAVITY = 30;
-
-    const STEPS_PER_FRAME = 5;
-
+    scene.player = player;
 
     document.addEventListener( 'keydown', ( event ) => {
 
@@ -51,7 +27,7 @@ function App() {
 
     } );
 
-    container?.addEventListener( 'mousedown', () => {
+    scene.container?.addEventListener( 'mousedown', () => {
 
         document.body.requestPointerLock();
 
@@ -76,6 +52,34 @@ function App() {
 
     } );
 
+    function animate() {
+
+        const deltaTime = Math.min( 0.05, clock.getDelta() ) / Scene.STEPS_PER_FRAME;
+
+        // we look for collisions in substeps to mitigate the risk of
+        // an object traversing another too quickly for detection.
+
+        for ( let i = 0; i < Scene.STEPS_PER_FRAME; i ++ ) {
+
+            player.controls( deltaTime );
+
+            player.updatePlayer( deltaTime );
+
+            Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, player );
+
+            player.teleportPlayerIfOob();
+
+        }
+
+        scene.renderer.render( scene.scene, scene.camera );
+
+        requestAnimationFrame( animate );
+
+    }
+
+    animate();
+
+    /*
     window.addEventListener( 'resize', onWindowResize );
 
     function onWindowResize() {
@@ -83,97 +87,12 @@ function App() {
         scene.camera.aspect = window.innerWidth / window.innerHeight;
         scene.camera.updateProjectionMatrix();
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        scene.renderer.setSize( window.innerWidth, window.innerHeight );
 
     }
+    */
 
-    const loader = new GLTFLoader().setPath( './models/gltf/' );
-
-    loader.load( 'collision-world.glb', ( gltf ) => {
-
-        scene.scene.add( gltf.scene );
-
-        scene.worldOctree.fromGraphNode( gltf.scene );
-
-        gltf.scene.traverse( child => {
-
-            if ( child.isMesh ) {
-
-                child.castShadow = true;
-                child.receiveShadow = true;
-
-                if ( child.material.map ) {
-
-                    child.material.map.anisotropy = 4;
-
-                }
-
-            }
-
-        } );
-
-        const helper = new OctreeHelper( scene.worldOctree );
-        helper.visible = false;
-        scene.scene.add( helper );
-
-        const gui = new GUI( { width: 200 } );
-        gui.add( { debug: false }, 'debug' )
-            .onChange( function ( value ) {
-
-                helper.visible = value;
-
-            } );
-
-        animate();
-
-    } );
-
-    function animate() {
-
-        const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
-
-        // we look for collisions in substeps to mitigate the risk of
-        // an object traversing another too quickly for detection.
-
-        for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
-
-            player.controls( deltaTime );
-
-            player.updatePlayer( deltaTime );
-
-            Sphere.updateSpheres( scene, deltaTime, GRAVITY, player );
-
-            player.teleportPlayerIfOob();
-
-        }
-
-        renderer.render( scene.scene, scene.camera );
-
-        requestAnimationFrame( animate );
-
-    }
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  return ( <></> )
 }
 
 export default App

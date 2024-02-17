@@ -3,9 +3,6 @@ import * as THREE from "three";
 import Player from "./Player";
 
 interface SphereProps {
-    scene: THREE.Scene;
-    worldOctree: any;
-    gravity: number;
 }
 
 export default class Sphere extends Component<SphereProps> {
