@@ -13,6 +13,8 @@ export default class Scene extends Component<SceneProps> {
     static GRAVITY = 30;
     static STEPS_PER_FRAME = 5;
 
+    public compteur_sphere;
+
     public scene = new THREE.Scene();
     public player : any;
     public spheres : any[] = [];
@@ -30,6 +32,7 @@ export default class Scene extends Component<SceneProps> {
         this.camera.rotation.order = 'YXZ';
         this.scene.background = new THREE.Color( 0x88ccee );
         this.scene.fog = new THREE.Fog( 0x88ccee, 0, 50 );
+        this.compteur_sphere = 0;
 
         const fillLight1 = new THREE.HemisphereLight( 0x8dc1de, 0x00668d, 1.5 );
         fillLight1.position.set( 2, 1, 1 );
@@ -63,10 +66,13 @@ export default class Scene extends Component<SceneProps> {
         this.loadMap();
 
         // load models
-        this.loadSphere( 'coin.gltf.glb', 5, SPHERE_RADIUS );
-        this.loadSphere( 'torch.gltf.glb', 5, SPHERE_RADIUS );
-        this.loadSphere( 'key.gltf.glb', 5, SPHERE_RADIUS );
-        this.loadSphere( 'chair.gltf.glb', 5, SPHERE_RADIUS );
+        for(let i=0; i<100; i++) {
+            this.loadSphere( 'coin.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'torch.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'key.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'chair.gltf.glb', SPHERE_RADIUS );
+        }
+
     }
 
     loadMap(){
@@ -91,28 +97,31 @@ export default class Scene extends Component<SceneProps> {
     }
 
     // path: chemin vers le fichier
-    // n_: nombre de models à générer
     // r_: rayon du modèle (pour les collisions)
-    loadSphere( path_: string, n_: number, r_: number ) {
+    loadSphere( path_: string, r_: number ) {
         this.loader.load( path_, ( gltf ) => {
-            for ( let i = 0; i < n_; i ++ ) {
-                const model_ = gltf.scene.clone();
-                model_.castShadow = true;
-                model_.receiveShadow = true;
-                model_.name = "name_" + path_ + "_" + i;
-
-                model_.position.set( 0, -100, 0 );
-                this.scene.add( model_ );
-
-                this.spheres.push( {
-                    id: "name_" + path_ + "_" + i,
-                    mesh: model_,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
+            this.createSphere(gltf, r_);
         } );
+    }
+
+    createSphere(gltf: any, r_: number) {
+        const model_ = gltf.scene.clone();
+        model_.castShadow = true;
+        model_.receiveShadow = true;
+        model_.name = "sphere_number_" + this.compteur_sphere;
+        console.log(model_.name);
+
+        model_.position.set( 0, -100, 0 );
+        this.scene.add( model_ );
+
+        this.spheres.push( {
+            id: "sphere_number_" + this.compteur_sphere,
+            mesh: model_,
+            collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
+            velocity: new THREE.Vector3()
+        } );
+
+        this.compteur_sphere += 1;
     }
 
     // with objects
@@ -147,15 +156,18 @@ export default class Scene extends Component<SceneProps> {
                 // remove object..
                 let selectedName = sphere.mesh.name;
                 let selectedObject = this.scene.getObjectByName( selectedName );
-                // ..from the scene
-                this.scene.remove( selectedObject! );
                 // ..from the list of spheres
                 this.spheres.splice(this.spheres.findIndex(function(i){
                     return i.id === selectedName;
                 }), 1);
+                // ..from the scene
+                this.scene.remove( selectedObject! );
+
 
                 // add new munitions
-                //this.player.ammo += 1;
+                this.player.ammo += 1;
+                this.loadSphere( 'coin.gltf.glb', 0.2 );
+
             }
         }
     }

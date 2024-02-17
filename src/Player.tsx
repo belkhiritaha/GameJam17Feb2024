@@ -16,7 +16,7 @@ export default class Player extends Component<PlayerProps> {
     public playerCollider = new Capsule( new THREE.Vector3( 0, 0.35, 0 ), new THREE.Vector3( 0, 1, 0 ), 0.35 );
     public sphereIdx = 0;
 
-    public ammo = 10;
+    public ammo = 300;
 
     constructor( props : PlayerProps ) {
         super( props );
@@ -60,11 +60,7 @@ export default class Player extends Component<PlayerProps> {
 
         }
 
-        if ( this.keyStates[ 'KeyA' ] ) {
-
-            this.playerVelocity.add( this.getSideVector().multiplyScalar( - speedDelta ) );
-
-        }
+        if ( this.keyStates[ 'KeyA' ] ) { this.playerVelocity.add( this.getSideVector().multiplyScalar( - speedDelta ) ); }
 
         if ( this.keyStates[ 'KeyD' ] ) {
 
@@ -72,39 +68,21 @@ export default class Player extends Component<PlayerProps> {
 
         }
 
-        if ( this.playerOnFloor ) {
-
-            if ( this.keyStates[ 'Space' ] ) {
-
-                this.playerVelocity.y = 15;
-
-            }
-
-        }
+        if ( this.playerOnFloor ) { if ( this.keyStates[ 'Space' ] ) { this.playerVelocity.y = 15; } }
 
     }
 
     // with map
     playerCollisions() {
-
         const result = this.props.scene.worldOctree.capsuleIntersect( this.playerCollider );
-
         this.playerOnFloor = false;
-
         if ( result ) {
-
             this.playerOnFloor = result.normal.y > 0;
-
             if ( ! this.playerOnFloor ) {
-
                 this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
-
             }
-
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
-
         }
-
     }
 
     //
