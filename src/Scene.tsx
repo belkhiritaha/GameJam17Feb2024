@@ -13,6 +13,8 @@ export default class Scene extends Component<SceneProps> {
     static GRAVITY = 30;
     static STEPS_PER_FRAME = 5;
 
+    public compteur_sphere;
+
     public scene = new THREE.Scene();
     public player : any;
     public spheres : any[] = [];
@@ -33,6 +35,7 @@ export default class Scene extends Component<SceneProps> {
         this.camera.rotation.order = 'YXZ';
         this.scene.background = new THREE.Color( 0x88ccee );
         this.scene.fog = new THREE.Fog( 0x88ccee, 0, 50 );
+        this.compteur_sphere = 0;
 
         const fillLight1 = new THREE.HemisphereLight( 0x8dc1de, 0x00668d, 1.5 );
         fillLight1.position.set( 2, 1, 1 );
@@ -60,101 +63,24 @@ export default class Scene extends Component<SceneProps> {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.container?.appendChild( this.renderer.domElement );
 
-        const NUM_SPHERES = 2;
-        const SPHERE_RADIUS = 0.2;
-
-        const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
+        const SPHERE_RADIUS = 0.3;
 
         // load map
         this.loadMap();
 
-        // load coins
-        this.loader.load( 'coin.gltf.glb', ( gltf ) => {
-            console.log(gltf.scene);
-            for ( let i = 0; i < NUM_SPHERES; i ++ ) {
-                const coin_model = gltf.scene.clone();
-                coin_model.castShadow = true;
-                coin_model.receiveShadow = true;
-
-                coin_model.position.set( 0, - 100, 0 );
-                this.scene.add( coin_model );
-
-                this.spheres.push( {
-                    mesh: coin_model,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
-        
-        // load warrior skeleton
-        this.loader.load('Skeleton_Warrior.glb', ( gltf ) => {
-            for ( let i = 0; i < 2; i ++ ) {
-                const model_warrior_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
-                model_warrior_skeleton.castShadow = true;
-                model_warrior_skeleton.receiveShadow = true;
-                
-                model_warrior_skeleton.position.set( 0, - 100, 0 );
-                this.scene.add( model_warrior_skeleton );
-
-                this.spheres.push( {
-                    mesh: model_warrior_skeleton,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
-
-        // load mage skeleton
-        this.loader.load('Skeleton_Mage.glb', ( gltf ) => {
-            for ( let i = 0; i < 2; i ++ ) {
-                const model_mage_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
-                model_mage_skeleton.castShadow = true;
-                model_mage_skeleton.receiveShadow = true;
-                
-                model_mage_skeleton.position.set( 0, - 100, 0 );
-                this.scene.add( model_mage_skeleton );
-
-                this.spheres.push( {
-                    mesh: model_mage_skeleton,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
-
-        // load rogue skeleton
-        this.loader.load('Skeleton_Rogue.glb', ( gltf ) => {
-            for ( let i = 0; i < 2; i ++ ) {
-                const model_rogue_skeleton = (gltf.scene.children[0].children[2] as THREE.SkinnedMesh).skeleton.bones[14].children[0].clone(); 
-                model_rogue_skeleton.castShadow = true;
-                model_rogue_skeleton.receiveShadow = true;
-                
-                model_rogue_skeleton.position.set( 0, - 100, 0 );
-                this.scene.add( model_rogue_skeleton );
-
-                this.spheres.push( {
-                    mesh: model_rogue_skeleton,
-                    collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), SPHERE_RADIUS ),
-                    velocity: new THREE.Vector3()
-                } );
-
-            }
-        } );
+        // load models
+        for(let i=0; i<100; i++) {
+            this.loadSphere( 'coin.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'torch.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'key.gltf.glb', SPHERE_RADIUS );
+            this.loadSphere( 'chair.gltf.glb', SPHERE_RADIUS );
+        }
 
     }
 
     loadMap(){
-
-
-        // load world
         this.loader.load( 'collision-world.glb', ( gltf ) => {
-
             this.scene.add( gltf.scene );
-
             this.worldOctree.fromGraphNode( gltf.scene );
 
             gltf.scene.traverse( child => {
@@ -164,16 +90,88 @@ export default class Scene extends Component<SceneProps> {
                     child.castShadow = true;
                     child.receiveShadow = true;
 
-                    if ( child.material.map ) {
-
-                        child.material.map.anisotropy = 4;
-
-                    }
+                    if ( child.material.map ) { child.material.map.anisotropy = 4; }
 
                 }
 
             } );
         } );
+    }
+
+    // path: chemin vers le fichier
+    // r_: rayon du modèle (pour les collisions)
+    loadSphere( path_: string, r_: number ) {
+        this.loader.load( path_, ( gltf ) => {
+            this.createSphere(gltf, r_);
+        } );
+    }
+
+    createSphere(gltf: any, r_: number) {
+        const model_ = gltf.scene.clone();
+        model_.castShadow = true;
+        model_.receiveShadow = true;
+        model_.name = "sphere_number_" + this.compteur_sphere;
+        console.log(model_.name);
+
+        model_.position.set( 0, -100, 0 );
+        this.scene.add( model_ );
+
+        this.spheres.push( {
+            id: "sphere_number_" + this.compteur_sphere,
+            mesh: model_,
+            collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
+            velocity: new THREE.Vector3()
+        } );
+
+        this.compteur_sphere += 1;
+    }
+
+    // with objects
+    playerSphereCollision( sphere : any ) {
+
+        const center = Sphere.vector1.addVectors( this.player.playerCollider.start, this.player.playerCollider.end ).multiplyScalar( 0.5 );
+
+        const sphere_center = sphere.collider.center;
+
+        const r = this.player.playerCollider.radius + sphere.collider.radius;
+        const r2 = r * r;
+
+        // approximation: player = 3 spheres
+
+        for ( const point of [ this.player.playerCollider.start, this.player.playerCollider.end, center ] ) {
+
+            const d2 = point.distanceToSquared( sphere_center );
+
+            if ( d2 < r2 ) {
+
+                // effet de recul
+                const normal = Sphere.vector1.subVectors( point, sphere_center ).normalize();
+                const v1 = Sphere.vector2.copy( normal ).multiplyScalar( normal.dot( this.player.playerVelocity ) );
+                const v2 = Sphere.vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
+
+                this.player.playerVelocity.add( v2 ).sub( v1 );
+                sphere.velocity.add( v1 ).sub( v2 );
+
+                const d = ( r - Math.sqrt( d2 ) ) / 2;
+                sphere_center.addScaledVector( normal, - d );
+
+                // remove object..
+                let selectedName = sphere.mesh.name;
+                let selectedObject = this.scene.getObjectByName( selectedName );
+                // ..from the list of spheres
+                this.spheres.splice(this.spheres.findIndex(function(i){
+                    return i.id === selectedName;
+                }), 1);
+                // ..from the scene
+                this.scene.remove( selectedObject! );
+
+
+                // add new munitions
+                this.player.ammo += 1;
+                this.loadSphere( 'coin.gltf.glb', 0.2 );
+
+            }
+        }
     }
 
 }

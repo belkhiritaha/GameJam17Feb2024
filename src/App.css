@@ -1,3 +1,8 @@
+@font-face {
+  font-family: myFirstFont;
+  src: url('../public/fonts/Olondona.otf');
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +44,15 @@
 
 .read-the-docs {
   color: #888;
+}
+
+#info {
+  font-family: myFirstFont;
+  font-size: 100px;
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
 }
