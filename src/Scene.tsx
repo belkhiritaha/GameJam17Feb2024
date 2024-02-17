@@ -84,6 +84,8 @@ export default class Scene extends Component<SceneProps> {
         this.loadOthers( 'chair.gltf.glb', SPHERE_RADIUS );
         this.loadOthers( 'key.gltf.glb', SPHERE_RADIUS );
         this.loadOthers( 'plate.gltf.glb', SPHERE_RADIUS );
+        //this.compteur_others += 4;
+        //this.player.ammo_others += 4;
     }
 
     loadMap(){
@@ -109,7 +111,7 @@ export default class Scene extends Component<SceneProps> {
     // path: chemin vers le fichier
     // r_: rayon du modèle (pour les collisions)
 
-    loadCoin() {
+    loadCoin(position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
         this.loader.load( 'coin.gltf.glb', ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
@@ -123,8 +125,8 @@ export default class Scene extends Component<SceneProps> {
                 id: "coin_number_" + this.compteur_coins,
                 isCoin: true,
                 mesh: model_,
-                collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), 0.2 ),
-                velocity: new THREE.Vector3()
+                collider: new THREE.Sphere( position , 0.2 ),
+                velocity: velocity
             } );
             this.compteur_coins += 1;
             this.player.ammo_coin += 1;
@@ -133,7 +135,7 @@ export default class Scene extends Component<SceneProps> {
 
     }
 
-    loadOthers( path_: string, r_: number ) {
+    loadOthers( path_: string, r_: number, position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
         this.loader.load( path_, ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
@@ -147,12 +149,11 @@ export default class Scene extends Component<SceneProps> {
                 id: "others_number_" + this.compteur_others,
                 isCoin: false,
                 mesh: model_,
-                collider: new THREE.Sphere( new THREE.Vector3( 0, - 100, 0 ), r_ ),
-                velocity: new THREE.Vector3()
+                collider: new THREE.Sphere( position, r_ ),
+                velocity: velocity
             } );
 
-            this.compteur_others += 1;
-            this.player.ammo_others += 1;
+            
         } );
     }
 

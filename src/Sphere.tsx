@@ -63,7 +63,7 @@ export default class Sphere extends Component<SphereProps> {
         let spheres = scene.list_coins.concat(scene.list_others);
         spheres.forEach( ( sphere : any)  => {
 
-            sphere.collider.center.addScaledVector( sphere.velocity, deltaTime );
+            sphere.collider?.center?.addScaledVector( sphere.velocity, deltaTime );
 
             const result = scene.worldOctree.sphereIntersect( sphere.collider );
 

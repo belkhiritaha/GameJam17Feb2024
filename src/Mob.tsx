@@ -26,7 +26,7 @@ export default class Mob extends Component<MobProps> {
     public idleAction : any;
     public attackAction : any = [];
     public hp = 100;
-
+    public isDead = false;
 
     constructor( props : MobProps ) {
 
@@ -157,16 +157,14 @@ export default class Mob extends Component<MobProps> {
                 const z = center.z + radius * Math.sin(angle);
                 // initial outwards velocity
                 const vel = new THREE.Vector3(x - center.x, 0, z - center.z).normalize().multiplyScalar(10);
-                // this.props.scene.loadSphere( 'torch.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
                 if (i < 3) {
-                    this.props.scene.loadSphere( 'coin.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel, true );
+                    this.props.scene.loadCoin( new THREE.Vector3(x, center.y, z), vel );
                 }
                 else {
-                    this.props.scene.loadSphere( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                    this.props.scene.loadOthers( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel );
+                    //this.props.scene.compteur_others += 1; todo
                 }
-                // else {
-                //     this.props.scene.loadSphere( this.props.model_path, 0.2, new THREE.Vector3(x, center.y, z), vel );
-                // }
+
             }
             this.isDead = true;
             this.mixer.stopAllAction();
