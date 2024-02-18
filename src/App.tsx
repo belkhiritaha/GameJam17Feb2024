@@ -29,7 +29,7 @@ function App() {
     scene.player = player;
 
     const mobs : any[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
         const mob = new Mob( { loader:loadingManager, gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
         mobs.push(mob);
     }
