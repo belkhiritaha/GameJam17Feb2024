@@ -10,14 +10,27 @@ function App() {
     let mouseTime = 0;
     const clock = new THREE.Clock();
     let isFirstClick = true;
+    let appIsLoading = true;
 
-    const scene = new Scene( {} );
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onLoad = function () {
+        console.log(`Just finished loading!`);
+        appIsLoading = false;
+
+        document.getElementById('loading')!.style.display = "none";
+        document.getElementById('inventaire')!.style.display = "block";
+        document.getElementById('viseur')!.style.display = "block";
+        document.getElementById('container')!.style.display = "block";
+        document.getElementById('root')!.style.display = "block";
+    }
+
+    const scene = new Scene( { loaderManager: loadingManager } );
     const player = new Player( { gravity: 30, scene, mouseTime } );
     scene.player = player;
 
     const mobs : any[] = [];
     for (let i = 0; i < 3; i++) {
-        const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
+        const mob = new Mob( { loader:loadingManager, gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
         mobs.push(mob);
     }
     scene.mobs = mobs;
@@ -51,14 +64,10 @@ function App() {
     } );
 
     document.body.addEventListener( 'mousemove', ( event ) => {
-
         if ( document.pointerLockElement === document.body ) {
-
             scene.camera.rotation.y -= event.movementX / 500;
             scene.camera.rotation.x -= event.movementY / 500;
-
         }
-
     } );
 
     function animate() {
@@ -93,7 +102,7 @@ function App() {
 
     animate();
 
-  return ( <> </> )
+    return ( <> </> )
 }
 
 export default App

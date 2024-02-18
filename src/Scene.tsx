@@ -5,7 +5,7 @@ import { Octree } from 'three/addons/math/Octree.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 interface SceneProps {
-    //clock: THREE.Clock
+    loaderManager: THREE.LoadingManager
 }
 
 export default class Scene extends Component<SceneProps> {
@@ -29,7 +29,7 @@ export default class Scene extends Component<SceneProps> {
     public renderer = new THREE.WebGLRenderer( { antialias: true } );
     public container = document.getElementById( 'container' );
 
-    public loader = new GLTFLoader().setPath( './models/gltf/' );
+    public loader;
 
     public model_coin: any;
     public model_warrior_skeleton: any;
@@ -39,6 +39,7 @@ export default class Scene extends Component<SceneProps> {
     constructor( props : SceneProps ) {
         super( props );
         this.camera.rotation.order = 'YXZ';
+        this.loader = new GLTFLoader(props.loaderManager).setPath( './models/gltf/' );
         this.scene.background = new THREE.CubeTextureLoader().load([
             "test_right.png", "test_left.png",
             "test_top.png", "test_bottom.png",
@@ -161,7 +162,7 @@ export default class Scene extends Component<SceneProps> {
                 velocity: velocity
             } );
 
-            
+
         } );
     }
 
