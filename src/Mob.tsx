@@ -138,6 +138,8 @@ export default class Mob extends Component<MobProps> {
                         }
                         this.props.scene.list_coins.splice(this.props.scene.list_coins.findIndex((coin : any) => coin.id === sphere.id), 1);
                     }
+
+                    this.props.scene.playThrowSound("hit");
                 }
             }
 
@@ -212,6 +214,7 @@ export default class Mob extends Component<MobProps> {
             if (playerPos.distanceTo(mobPos) < 2) {
                 this.attackAction.play();
                 player.healthPoints -= 0.1;
+                this.props.scene.playThrowSound("get_hit");
             }
             else {
                 this.attackAction.stop();
