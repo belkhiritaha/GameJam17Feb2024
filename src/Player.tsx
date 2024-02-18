@@ -82,7 +82,7 @@ export default class Player extends Component<PlayerProps> {
                         this.props.scene.list_coins.splice(this.props.scene.list_coins.findIndex((coin : any) => !coin.isOnGround), 1);
                     }
 
-                    // add numItems 
+                    // add numItems
                     for (let i = 0; i < this.props.scene.shop.numItems; i++) {
                         this.props.scene.loadOthers( null, 0.3 , new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false );
                     }
@@ -90,7 +90,7 @@ export default class Player extends Component<PlayerProps> {
             }
             this.keyStates[ 'KeyE' ] = false;
         }
-            
+
 
         if ( this.playerOnFloor ) { if ( this.keyStates[ 'Space' ] ) { this.playerVelocity.y = 5; } }
 
@@ -197,8 +197,18 @@ export default class Player extends Component<PlayerProps> {
 
         this.props.scene.camera.position.copy( this.playerCollider.end );
 
-        document.getElementById('points_de_vie')!.innerHTML = "" + this.healthPoints;
+        document.getElementById('points_de_vie')!.value = this.healthPoints;
         document.getElementById('pieces_restantes')!.innerHTML = "" + this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length;
         document.getElementById('autres_objets_restants')!.innerHTML = "" + this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null ).length;
+
+        // player dead
+        if(this.healthPoints <= 0) {
+            document.exitPointerLock();
+            document.getElementById('inventaire')!.style.display = "none";
+            document.getElementById('viseur')!.style.display = "none";
+            document.getElementById('container')!.style.display = "none";
+            document.getElementById('root')!.style.display = "none";
+            document.getElementById('end_game')!.style.display = "block";
+        }
     }
 }

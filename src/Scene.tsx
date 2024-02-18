@@ -205,8 +205,8 @@ export default class Scene extends Component<SceneProps> {
             path = "torch" + path;
         }
 
-        
-        
+
+
         this.loader.load( path_ ?? path, ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
@@ -253,7 +253,7 @@ export default class Scene extends Component<SceneProps> {
                 const v1 = Sphere.vector2.copy( normal ).multiplyScalar( normal.dot( this.player.playerVelocity ) );
                 const v2 = Sphere.vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
 
-                this.player.playerVelocity.add( v2 ).sub( v1 ).multiplyScalar( 2 );
+                this.player.playerVelocity.add( v2 ).sub( v1 );
                 sphere.velocity.add( v1 ).sub( v2 );
 
                 const d = ( r - Math.sqrt( d2 ) ) / 2;
