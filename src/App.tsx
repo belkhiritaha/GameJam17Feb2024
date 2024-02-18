@@ -9,6 +9,7 @@ import Mob from './Mob';
 function App() {
     let mouseTime = 0;
     const clock = new THREE.Clock();
+    let isFirstClick = true;
 
     const scene = new Scene( {} );
     const player = new Player( { gravity: 30, scene, mouseTime } );
@@ -42,9 +43,11 @@ function App() {
     } );
 
     document.addEventListener( 'mouseup', () => {
-
-        if ( document.pointerLockElement !== null ) player.throwBall();
-
+        if (isFirstClick) {
+            isFirstClick = false;
+        } else {
+            if ( document.pointerLockElement !== null ) player.throwBall();
+        }
     } );
 
     document.body.addEventListener( 'mousemove', ( event ) => {
@@ -89,19 +92,6 @@ function App() {
     }
 
     animate();
-
-    /*
-    window.addEventListener( 'resize', onWindowResize );
-
-    function onWindowResize() {
-
-        scene.camera.aspect = window.innerWidth / window.innerHeight;
-        scene.camera.updateProjectionMatrix();
-
-        scene.renderer.setSize( window.innerWidth, window.innerHeight );
-
-    }
-    */
 
   return ( <> </> )
 }
