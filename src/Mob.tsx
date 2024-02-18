@@ -5,6 +5,7 @@ import Sphere from "./Sphere";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 interface MobProps {
+    loader: THREE.LoadingManager,
     scene: any;
     gravity: number;
     position: THREE.Vector3;
@@ -33,9 +34,7 @@ export default class Mob extends Component<MobProps> {
         super( props );
         this.id = props.id;
 
-        const loader = new GLTFLoader().setPath( './models/gltf/' );
-
-        // const texture = new THREE.TextureLoader().load("knight_texture.png");
+        const loader = new GLTFLoader(props.loader).setPath( './models/gltf/' );
 
         loader.load(
             props.model_path,

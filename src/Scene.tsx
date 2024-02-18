@@ -5,7 +5,7 @@ import { Octree } from 'three/addons/math/Octree.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 interface SceneProps {
-    //clock: THREE.Clock
+    loaderManager: THREE.LoadingManager
 }
 
 export default class Scene extends Component<SceneProps> {
@@ -30,7 +30,7 @@ export default class Scene extends Component<SceneProps> {
     public renderer = new THREE.WebGLRenderer( { antialias: true } );
     public container = document.getElementById( 'container' );
 
-    public loader = new GLTFLoader().setPath( './models/gltf/' );
+    public loader;
 
     public model_coin: any;
     public model_warrior_skeleton: any;
@@ -40,6 +40,7 @@ export default class Scene extends Component<SceneProps> {
     constructor( props : SceneProps ) {
         super( props );
         this.camera.rotation.order = 'YXZ';
+        this.loader = new GLTFLoader(props.loaderManager).setPath( './models/gltf/' );
         this.scene.background = new THREE.CubeTextureLoader().load([
             "test_right.png", "test_left.png",
             "test_top.png", "test_bottom.png",
@@ -81,7 +82,8 @@ export default class Scene extends Component<SceneProps> {
         this.loadMap();
 
         // load 5 coins
-        for(let i=0; i<5; i++) {
+
+        for(let i=0; i<20; i++) {
             this.loadCoin( new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), new THREE.Vector3(0, 0, 0), true );
         }
         // and 4 others
@@ -162,7 +164,7 @@ export default class Scene extends Component<SceneProps> {
                 velocity: velocity
             } );
 
-            
+
         } );
     }
 

@@ -9,6 +9,7 @@ interface PlayerProps {
 }
 
 export default class Player extends Component<PlayerProps> {
+    public healthPoints = 10;
     public playerDirection = new THREE.Vector3();
     public playerVelocity = new THREE.Vector3();
     public playerOnFloor = false;
@@ -192,6 +193,7 @@ export default class Player extends Component<PlayerProps> {
 
         this.props.scene.camera.position.copy( this.playerCollider.end );
 
+        document.getElementById('points_de_vie')!.innerHTML = "" + this.healthPoints;
         document.getElementById('pieces_restantes')!.innerHTML = "" + this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length;
         document.getElementById('autres_objets_restants')!.innerHTML = "" + this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null ).length;
     }
