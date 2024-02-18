@@ -38,7 +38,7 @@
   }
 }
 
-#loading {
+#loading, #end_game {
   position: absolute;
   text-align: center;
   width: 100%;

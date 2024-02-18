@@ -201,10 +201,10 @@ export default class Mob extends Component<MobProps> {
         if (playerPos.distanceTo(mobPos) < 10) {
             this.idleAction.play();
             const direction = playerPos.clone().sub(mobPos).normalize();
-        
+
             const angle = Math.atan2(direction.x, direction.z);
             this.gltf && (this.gltf.rotation.y = angle);
-    
+
             const speed = 1;
             this.mobVelocity.copy(direction).multiplyScalar(speed);
 
