@@ -41,9 +41,6 @@ export default class Scene extends Component<SceneProps> {
     static sound_hit: any;
     static sound_throw: any;
 
-
-
-
     constructor( props : SceneProps ) {
         super( props );
         this.camera.rotation.order = 'YXZ';
@@ -204,8 +201,6 @@ export default class Scene extends Component<SceneProps> {
         } else {
             path = "torch" + path;
         }
-
-
 
         this.loader.load( path_ ?? path, ( gltf ) => {
             const model_ = gltf.scene.clone();

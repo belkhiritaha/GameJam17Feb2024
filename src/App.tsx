@@ -11,20 +11,18 @@ function App() {
     let mouseTime = 0;
     const clock = new THREE.Clock();
     let isFirstClick = true;
-    let appIsLoading = true;
     let audioContext;
 
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onLoad = function () {
         console.log(`Just finished loading!`);
-        appIsLoading = false;
         isFirstClick = true;
         document.getElementById('loading')!.style.display = "none";
         document.getElementById('inventaire')!.style.display = "block";
         document.getElementById('viseur')!.style.display = "block";
         document.getElementById('container')!.style.display = "block";
         document.getElementById('root')!.style.display = "block";
-        
+
         audioContext = new AudioContext();
     }
 
@@ -86,10 +84,8 @@ function App() {
         // spawn monsters
         if(performance.now() - spawnMob > 5000){
 
-
             let m = new Mob( { loader:loadingManager, gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: mobs.length + 1, model_path: "Skeleton_Mage.glb" } );
             mobs.push(m);
-
 
             spawnMob = performance.now();
         }
@@ -103,6 +99,28 @@ function App() {
 
             player.updatePlayer( deltaTime );
 
+            // player dead
+            if(player.healthPoints <= 0) {
+                document.exitPointerLock();
+                document.getElementById('inventaire')!.style.display = "none";
+                document.getElementById('viseur')!.style.display = "none";
+                document.getElementById('container')!.style.display = "none";
+                document.getElementById('root')!.style.display = "none";
+                document.getElementById('end_game')!.style.display = "block";
+                break;
+            }
+
+            // player win
+            /*let p = 10
+            if( >= 11) {
+                document.exitPointerLock();
+                document.getElementById('inventaire')!.style.display = "none";
+                document.getElementById('viseur')!.style.display = "none";
+                document.getElementById('container')!.style.display = "none";
+                document.getElementById('root')!.style.display = "none";
+                document.getElementById('win_game')!.style.display = "block";
+                break;
+            }*/
 
             Sphere.updateSpheres( scene, deltaTime, Scene.GRAVITY, mobs );
 

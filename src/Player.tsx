@@ -202,15 +202,5 @@ export default class Player extends Component<PlayerProps> {
         document.getElementById('points_de_vie')!.value = this.healthPoints;
         document.getElementById('pieces_restantes')!.innerHTML = "" + this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length;
         document.getElementById('autres_objets_restants')!.innerHTML = "" + this.props.scene.list_others.map( ( other : any ) => !other.isOnGround ? other : null ).filter( ( other : any ) => other !== null ).length;
-
-        // player dead
-        if(this.healthPoints <= 0) {
-            document.exitPointerLock();
-            document.getElementById('inventaire')!.style.display = "none";
-            document.getElementById('viseur')!.style.display = "none";
-            document.getElementById('container')!.style.display = "none";
-            document.getElementById('root')!.style.display = "none";
-            document.getElementById('end_game')!.style.display = "block";
-        }
     }
 }

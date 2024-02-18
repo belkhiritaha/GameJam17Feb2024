@@ -216,7 +216,7 @@ export default class Mob extends Component<MobProps> {
             // if distance between the mob and the player is less than 2, then attack the player
             if (playerPos.distanceTo(mobPos) < 2 && performance.now() - this.lastAttackTime > 1000) {
                 this.attackAction.play();
-                player.healthPoints -= 0.1;
+                player.healthPoints -= 2;
                 this.props.scene.playThrowSound("get_hit");
                 this.lastAttackTime = performance.now();
                 console.log("lastAttackTime: ", this.lastAttackTime);
