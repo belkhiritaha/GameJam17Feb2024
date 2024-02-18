@@ -12,6 +12,7 @@ function App() {
     const clock = new THREE.Clock();
     let isFirstClick = true;
     let appIsLoading = true;
+    let audioContext;
 
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onLoad = function () {
@@ -23,6 +24,8 @@ function App() {
         document.getElementById('viseur')!.style.display = "block";
         document.getElementById('container')!.style.display = "block";
         document.getElementById('root')!.style.display = "block";
+        
+        audioContext = new AudioContext();
     }
 
     const scene = new Scene( { loaderManager: loadingManager } );

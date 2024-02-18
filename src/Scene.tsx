@@ -37,7 +37,9 @@ export default class Scene extends Component<SceneProps> {
     public model_mage_skeleton: any;
     public model_rogue_skeleton: any;
 
-    public sound_hit: any;
+    static sound_gethit: any;
+    static sound_hit: any;
+    static sound_throw: any;
 
 
 
@@ -89,16 +91,20 @@ export default class Scene extends Component<SceneProps> {
 
         // load a sound and set it as the Audio object's buffer
         const audioLoader = new THREE.AudioLoader();
-        audioLoader.load( 'sounds/mixkit-basketball-ball-hard-hit-2093.wav', function( buffer ) {
-            const sound_ = sound;
-            sound_.setBuffer( buffer );
-            sound_.setLoop( true );
-            sound_.setVolume( 0.5 );
-            this.sound_hit = sound_;
-
-            sound.play();
+        audioLoader.load( 'sounds/hit.wav', function( buffer ) {
+            sound.setBuffer( buffer );
+            sound.duration = 0.5;
+            sound.setLoop( false );
+            sound.setVolume( 0.5 );
+            Scene.sound_hit = sound;
         });
 
+        audioLoader.load( 'sounds/gethit.wav', function( buffer ) {
+            sound.setBuffer( buffer );
+            sound.setLoop( false );
+            sound.setVolume( 0.5 );
+            Scene.sound_gethit = sound;
+        });
 
         const SPHERE_RADIUS = 0.3;
 
@@ -116,6 +122,23 @@ export default class Scene extends Component<SceneProps> {
         this.loadOthers( null, SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
         //this.compteur_others += 4;
         //this.player.ammo_others += 4;
+    }
+
+    playThrowSound(soundName: string) {
+        const listener = new THREE.AudioListener();
+        this.camera.add( listener );
+        const sound = new THREE.Audio( listener );
+
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load( 'sounds/' + soundName + '.wav', function( buffer ) {
+            sound.setBuffer( buffer );
+            sound.setLoop( false );
+            sound.setVolume( 0.5 );
+            sound.play();
+        });
+
+        // delete listener
+        this.camera.remove( listener );
     }
 
     loadMap(){
@@ -245,6 +268,8 @@ export default class Scene extends Component<SceneProps> {
                     sphere.collider.center.set(0, -100, 0);
                     // set as not on ground
                     sphere.isOnGround = false;
+                    this.playThrowSound("coin");
+
                     // ..from the list of list_coins
                     // this.list_coins.splice(this.list_coins.findIndex(function(i){
                     //     return i.id === selectedName;

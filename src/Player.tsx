@@ -1,6 +1,7 @@
 import { Component } from "react";
 import * as THREE from "three";
 import { Capsule } from "three/examples/jsm/Addons.js";
+import Scene from "./Scene";
 
 interface PlayerProps {
     scene: any;
@@ -139,6 +140,7 @@ export default class Player extends Component<PlayerProps> {
             other.isOnGround = true;
             other.isBeingThrown = true;
 
+            this.props.scene.playThrowSound("throw");
         } else {
             if(this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length > 0) {
                 // throw coin
@@ -152,6 +154,8 @@ export default class Player extends Component<PlayerProps> {
                 // make it on ground
                 coin.isOnGround = true;
                 coin.isBeingThrown = true;
+
+                this.props.scene.playThrowSound("throw");
             }
         }
     }
