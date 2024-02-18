@@ -268,7 +268,7 @@ export default class Scene extends Component<SceneProps> {
                     sphere.collider.center.set(0, -100, 0);
                     // set as not on ground
                     sphere.isOnGround = false;
-                    this.playThrowSound("coin");
+                    this.playThrowSound("minecraft");
 
                     // ..from the list of list_coins
                     // this.list_coins.splice(this.list_coins.findIndex(function(i){

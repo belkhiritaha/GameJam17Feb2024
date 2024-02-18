@@ -86,6 +86,8 @@ export default class Player extends Component<PlayerProps> {
                     for (let i = 0; i < this.props.scene.shop.numItems; i++) {
                         this.props.scene.loadOthers( null, 0.3 , new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false );
                     }
+
+                    this.props.scene.playThrowSound("buy");
                 }
             }
             this.keyStates[ 'KeyE' ] = false;

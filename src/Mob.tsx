@@ -29,6 +29,8 @@ export default class Mob extends Component<MobProps> {
     public hp = 100;
     public isDead = false;
 
+    public lastAttackTime = 0;
+
     constructor( props : MobProps ) {
 
         super( props );
@@ -174,6 +176,7 @@ export default class Mob extends Component<MobProps> {
             }
             this.isDead = true;
             this.mixer.stopAllAction();
+            this.props.scene.playThrowSound("minecraft");
             this.gltf = null;
         }
     }
@@ -211,10 +214,12 @@ export default class Mob extends Component<MobProps> {
             this.mobVelocity.copy(direction).multiplyScalar(speed);
 
             // if distance between the mob and the player is less than 2, then attack the player
-            if (playerPos.distanceTo(mobPos) < 2) {
+            if (playerPos.distanceTo(mobPos) < 2 && performance.now() - this.lastAttackTime > 1000) {
                 this.attackAction.play();
                 player.healthPoints -= 0.1;
                 this.props.scene.playThrowSound("get_hit");
+                this.lastAttackTime = performance.now();
+                console.log("lastAttackTime: ", this.lastAttackTime);
             }
             else {
                 this.attackAction.stop();
