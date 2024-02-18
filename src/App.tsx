@@ -36,6 +36,7 @@ function App() {
     scene.shop = shop;
 
     const mobs : any[] = [];
+    let spawnMob = 0;
 
     for (let i = 0; i < 5; i++) {
         const mob = new Mob( { loader:loadingManager, gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
@@ -81,6 +82,17 @@ function App() {
     function animate() {
 
         const deltaTime = Math.min( 0.05, clock.getDelta() ) / Scene.STEPS_PER_FRAME;
+
+        // spawn monsters
+        if(performance.now() - spawnMob > 5000){
+
+
+            let m = new Mob( { loader:loadingManager, gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: mobs.length + 1, model_path: "Skeleton_Mage.glb" } );
+            mobs.push(m);
+
+
+            spawnMob = performance.now();
+        }
 
         // we look for collisions in substeps to mitigate the risk of
         // an object traversing another too quickly for detection.
