@@ -184,7 +184,7 @@ export default class Player extends Component<PlayerProps> {
             this.playerVelocity.y -= this.props.gravity * deltaTime;
 
             // small air resistance
-            damping *= 0.1;
+            damping *= 0.1 + Math.atan( 0.1 / this.props.scene.objective ) * this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length;
 
         }
 

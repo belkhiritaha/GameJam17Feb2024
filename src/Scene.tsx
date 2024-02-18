@@ -41,6 +41,7 @@ export default class Scene extends Component<SceneProps> {
     static sound_hit: any;
     static sound_throw: any;
 
+    public objective = 50;
 
 
 
@@ -142,18 +143,22 @@ export default class Scene extends Component<SceneProps> {
     }
 
     loadMap(){
-        this.loader.load( 'map.glb', ( gltf ) => {
+        this.loader.load( 'test_small_map.glb', ( gltf ) => {
+            
             this.scene.add( gltf.scene );
             this.worldOctree.fromGraphNode( gltf.scene );
 
             gltf.scene.traverse( child => {
+                child.frustumCulled = false;
+                child.castShadow = false;
+                child.receiveShadow = false;
 
                 if ( child.isMesh ) {
 
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+                    child.castShadow = false;
+                    child.receiveShadow = false;
 
-                    if ( child.material.map ) { child.material.map.anisotropy = 4; }
+                    // if ( child.material.map ) { child.material.map.anisotropy = 4; }
 
                 }
 

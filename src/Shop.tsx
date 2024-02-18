@@ -28,7 +28,7 @@ export default class Shop extends Component<ShopProps> {
         loader.load(
             "chest_gold.glb",
             (gltf : any) => {
-                gltf.scene.position.set(8, 1.25, 7);
+                gltf.scene.position.set(15, -8, 4);
                 gltf.scene.rotateY(Math.PI);
                 this.props.scene.scene.add(gltf.scene);
                 this.gltf = gltf.scene;
@@ -47,7 +47,7 @@ export default class Shop extends Component<ShopProps> {
                 });
                 const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
                 this.textMesh = new THREE.Mesh(textGeometry, textMaterial);
-                this.textMesh.position.copy(new THREE.Vector3(9, 3, 7));
+                this.textMesh.position.copy(new THREE.Vector3(15, -6, 4));
                 this.textMesh.rotateY(Math.PI);
                 this.props.scene.scene.add(this.textMesh);
         });
