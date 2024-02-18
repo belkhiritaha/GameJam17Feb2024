@@ -16,7 +16,7 @@ function App() {
     loadingManager.onLoad = function () {
         console.log(`Just finished loading!`);
         appIsLoading = false;
-
+        isFirstClick = true;
         document.getElementById('loading')!.style.display = "none";
         document.getElementById('inventaire')!.style.display = "block";
         document.getElementById('viseur')!.style.display = "block";
