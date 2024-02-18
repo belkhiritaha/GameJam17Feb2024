@@ -13,7 +13,7 @@ export default class Player extends Component<PlayerProps> {
     public playerVelocity = new THREE.Vector3();
     public playerOnFloor = false;
     public keyStates : any = {};
-    public playerCollider = new Capsule( new THREE.Vector3( 0, 0.35, 0 ), new THREE.Vector3( 0, 1, 0 ), 0.35 );
+    public playerCollider = new Capsule( new THREE.Vector3( 0, 10.35, 0 ), new THREE.Vector3( 0, 11, 0 ), 0.35 );
 
     constructor( props : PlayerProps ) {
         super( props );
@@ -79,6 +79,18 @@ export default class Player extends Component<PlayerProps> {
                 this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
             }
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
+        }
+    }
+
+    playerMobCollision( mob : any ) {
+        // if distance between the two is less than 2, then move them apart
+        if (!this.props.scene.camera || !mob.gltf) return;
+
+        const distance = this.props.scene.camera.position.distanceTo(mob.gltf.position);
+        if (distance < 1.5) {
+            const direction = new THREE.Vector3().subVectors(this.props.scene.camera.position, mob.gltf.position).normalize();
+            const delta = direction.multiplyScalar(1.5 - distance);
+            this.playerCollider.translate(delta);
         }
     }
 
@@ -150,6 +162,8 @@ export default class Player extends Component<PlayerProps> {
         this.playerCollider.translate( deltaPosition );
 
         this.playerCollisions();
+
+        this.props.scene.mobs.forEach( ( mob : any ) => this.playerMobCollision( mob ) );
 
         this.props.scene.camera.position.copy( this.playerCollider.end );
 

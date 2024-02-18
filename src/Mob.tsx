@@ -184,6 +184,18 @@ export default class Mob extends Component<MobProps> {
         }
     }
 
+    mobMobCollision( mob : any ) {
+        // if distance between the two mobs is less than 2, then move them apart
+        if (!this.gltf || !mob.gltf) return;
+
+        const distance = this.gltf.position.distanceTo(mob.gltf.position);
+        if (distance < 2) {
+            const direction = this.gltf.position.clone().sub(mob.gltf.position).normalize();
+            const delta = direction.multiplyScalar(2 - distance);
+            this.mobCollider.translate(delta);
+        }
+    }
+
 
     updateMob( deltaTime : number ) {
         if (!this.gltf) return;
@@ -224,6 +236,12 @@ export default class Mob extends Component<MobProps> {
         //
 
         this.mobCollisions();
+
+        this.props.scene.mobs.forEach((mob : any) => {
+            if (mob.id !== this.id) {
+                this.mobMobCollision(mob);
+            }
+        });
 
         if (this.mixer) {
             this.mixer.update(deltaTime);

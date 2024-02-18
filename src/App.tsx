@@ -16,7 +16,7 @@ function App() {
 
     const mobs : any[] = [];
     for (let i = 0; i < 3; i++) {
-        const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 20, 5, Math.random() * 20 ), id: i, model_path: "Skeleton_Mage.glb" } );
+        const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
         mobs.push(mob);
     }
     scene.mobs = mobs;

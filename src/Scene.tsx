@@ -39,7 +39,11 @@ export default class Scene extends Component<SceneProps> {
     constructor( props : SceneProps ) {
         super( props );
         this.camera.rotation.order = 'YXZ';
-        this.scene.background = new THREE.Color( 0x88ccee );
+        this.scene.background = new THREE.CubeTextureLoader().load([
+            "test_right.png", "test_left.png",
+            "test_top.png", "test_bottom.png",
+            "test_front.png", "test_back.png"
+        ]);
         this.scene.fog = new THREE.Fog( 0x88ccee, 0, 50 );
         this.compteur_coins = 0;
         this.compteur_others = 0;
@@ -89,7 +93,7 @@ export default class Scene extends Component<SceneProps> {
     }
 
     loadMap(){
-        this.loader.load( 'collision-world.glb', ( gltf ) => {
+        this.loader.load( 'map.glb', ( gltf ) => {
             this.scene.add( gltf.scene );
             this.worldOctree.fromGraphNode( gltf.scene );
 
