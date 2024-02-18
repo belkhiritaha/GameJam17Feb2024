@@ -9,7 +9,7 @@ interface PlayerProps {
 }
 
 export default class Player extends Component<PlayerProps> {
-    public healthPoints = 10;
+    public healthPoints = 100;
     public playerDirection = new THREE.Vector3();
     public playerVelocity = new THREE.Vector3();
     public playerOnFloor = false;
@@ -83,7 +83,7 @@ export default class Player extends Component<PlayerProps> {
 
                     // add numItems 
                     for (let i = 0; i < this.props.scene.shop.numItems; i++) {
-                        this.props.scene.loadOthers( "key.gltf.glb", 0.3 , new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false );
+                        this.props.scene.loadOthers( null, 0.3 , new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false );
                     }
                 }
             }
@@ -160,8 +160,8 @@ export default class Player extends Component<PlayerProps> {
 
         if ( this.props.scene.camera.position.y <= - 25 ) {
 
-            this.playerCollider.start.set( 0, 0.35, 0 );
-            this.playerCollider.end.set( 0, 1, 0 );
+            this.playerCollider.start.set( 0, 10.35, 0 );
+            this.playerCollider.end.set( 0, 11, 0 );
             this.playerCollider.radius = 0.35;
             this.props.scene.camera.position.copy( this.playerCollider.end );
             this.props.scene.camera.rotation.set( 0, 0, 0 );

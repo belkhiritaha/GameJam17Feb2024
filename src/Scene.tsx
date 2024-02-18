@@ -87,10 +87,10 @@ export default class Scene extends Component<SceneProps> {
             this.loadCoin( new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), new THREE.Vector3(0, 0, 0), true );
         }
         // and 4 others
-        this.loadOthers( 'torch.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
-        this.loadOthers( 'chair.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
-        this.loadOthers( 'key.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
-        this.loadOthers( 'plate.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( null, SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( null, SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( null, SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
+        this.loadOthers( null, SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );
         //this.compteur_others += 4;
         //this.player.ammo_others += 4;
     }
@@ -144,8 +144,24 @@ export default class Scene extends Component<SceneProps> {
 
     }
 
-    loadOthers( path_: string, r_: number, position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0), onGround: boolean = true) {
-        this.loader.load( path_, ( gltf ) => {
+    loadOthers( path_: string | null, r_: number, position: THREE.Vector3 = new THREE.Vector3(0, -100, 0), velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0), onGround: boolean = true) {
+        let path = ".gltf.glb"
+
+        // insert into path random "key" or "plate" or "chair" or "torch"
+        const rand = Math.floor(Math.random() * 4);
+        if(rand === 0) {
+            path = "key" + path;
+        } else if(rand === 1) {
+            path = "plate" + path;
+        } else if(rand === 2) {
+            path = "chair" + path;
+        } else {
+            path = "torch" + path;
+        }
+
+        
+        
+        this.loader.load( path_ ?? path, ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
             model_.receiveShadow = true;
@@ -191,7 +207,7 @@ export default class Scene extends Component<SceneProps> {
                 const v1 = Sphere.vector2.copy( normal ).multiplyScalar( normal.dot( this.player.playerVelocity ) );
                 const v2 = Sphere.vector3.copy( normal ).multiplyScalar( normal.dot( sphere.velocity ) );
 
-                this.player.playerVelocity.add( v2 ).sub( v1 );
+                this.player.playerVelocity.add( v2 ).sub( v1 ).multiplyScalar( 2 );
                 sphere.velocity.add( v1 ).sub( v2 );
 
                 const d = ( r - Math.sqrt( d2 ) ) / 2;

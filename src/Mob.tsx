@@ -25,7 +25,7 @@ export default class Mob extends Component<MobProps> {
     public gltf : any;
     public mixer : any;
     public idleAction : any;
-    public attackAction : any = [];
+    public attackAction : any;
     public hp = 100;
     public isDead = false;
 
@@ -46,15 +46,8 @@ export default class Mob extends Component<MobProps> {
                 this.mixer = new THREE.AnimationMixer(this.gltf);
 
                 this.idleAction = this.mixer.clipAction(gltf.animations[46]);
-                this.attackAction.push(this.mixer.clipAction(gltf.animations[0])); // from 0 to 3 are attack animations
-                this.attackAction.push(this.mixer.clipAction(gltf.animations[1]));
-                this.attackAction.push(this.mixer.clipAction(gltf.animations[2]));
-                this.attackAction.push(this.mixer.clipAction(gltf.animations[8]));
-                for (let i = 0; i < this.attackAction.length; i++) {
-                    // this.attackAction[i].clampWhenFinished = true;
-                    this.attackAction[i].loop = THREE.LoopOnce;
-                    this.attackAction[i].timeScale = 15;
-                }
+                this.attackAction = this.mixer.clipAction(gltf.animations[1]);
+                this.attackAction.timeScale = 1;
 
 
                 this.idleAction.timeScale = 3;
@@ -172,7 +165,7 @@ export default class Mob extends Component<MobProps> {
                     this.props.scene.loadCoin( new THREE.Vector3(x, center.y, z), vel, true );
                 }
                 else {
-                    this.props.scene.loadOthers( 'plate.gltf.glb', 0.2, new THREE.Vector3(x, center.y, z), vel, true );
+                    this.props.scene.loadOthers( null, 0.2, new THREE.Vector3(x, center.y, z), vel, true );
                     //this.props.scene.compteur_others += 1; todo
                 }
 
@@ -204,15 +197,30 @@ export default class Mob extends Component<MobProps> {
 
         const mobPos = this.mobCollider.start.clone().add(this.mobCollider.end).multiplyScalar(0.5);
 
-        const direction = playerPos.clone().sub(mobPos).normalize();
+        // if distance between the mob and the player is less than 10, then move the mob towards the player
+        if (playerPos.distanceTo(mobPos) < 10) {
+            this.idleAction.play();
+            const direction = playerPos.clone().sub(mobPos).normalize();
+        
+            const angle = Math.atan2(direction.x, direction.z);
+            this.gltf && (this.gltf.rotation.y = angle);
+    
+            const speed = 1;
+            this.mobVelocity.copy(direction).multiplyScalar(speed);
 
-        const angle = Math.atan2(direction.x, direction.z);
-        this.gltf && (this.gltf.rotation.y = angle);
+            // if distance between the mob and the player is less than 2, then attack the player
+            if (playerPos.distanceTo(mobPos) < 2) {
+                this.attackAction.play();
+                player.healthPoints -= 0.1;
+            }
+            else {
+                this.attackAction.stop();
+            }
+        }
+        else {
+            this.idleAction.play();
+        }
 
-
-        // Adjust the velocity of the mob to move towards the player
-        const speed = 1; // Adjust the speed as needed
-        this.mobVelocity.copy(direction).multiplyScalar(speed);
 
         let damping = Math.exp( - 4 * deltaTime ) - 1;
 
