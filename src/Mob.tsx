@@ -117,22 +117,11 @@ export default class Mob extends Component<MobProps> {
                 const d = ( r - Math.sqrt( d2 ) ) / 2;
                 sphere_center.addScaledVector( normal, - d );
                 if (sphere.isBeingThrown) {
-                    this.hp -= 25;
                     sphere.isBeingThrown = false;
-
-                    // update hp bar
-                    const hpBar = this.gltf.children
-                        .find((child : any) => child.name === "hpBar");
-                    if (hpBar) {
-                        hpBar.scale.x = this.hp / 100;
-                    }
-
-                    // if mob is dead
-                    if (this.hp <= 0 && !this.isDead) {
-                        this.killMob();
-                    }
-
+                    
+                    
                     if (sphere.isCoin) {
+                        this.hp -= 20;
                         // delete the coin
                         const coinSphere = this.props.scene.scene.getObjectByName(sphere.mesh.name);
                         if (coinSphere) {
@@ -140,8 +129,25 @@ export default class Mob extends Component<MobProps> {
                         }
                         this.props.scene.list_coins.splice(this.props.scene.list_coins.findIndex((coin : any) => coin.id === sphere.id), 1);
                     }
-
+                    else {
+                        this.hp -= 50;
+                    }
+                    console.log("hp: ", this.hp);
+                    
                     this.props.scene.playThrowSound("hit");
+                    
+                    // update hp bar
+                    const hpBar = this.gltf.children
+                    .find((child : any) => child.name === "hpBar");
+                    if (hpBar) {
+                        hpBar.scale.x = this.hp / 100;
+                    }
+                    
+                    // if mob is dead
+                    if (this.hp <= 1 && !this.isDead) {
+                        this.killMob();
+                    }
+                    
                 }
             }
 
