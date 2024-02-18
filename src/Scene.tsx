@@ -210,8 +210,6 @@ export default class Scene extends Component<SceneProps> {
             path = "torch" + path;
         }
 
-
-
         this.loader.load( path_ ?? path, ( gltf ) => {
             const model_ = gltf.scene.clone();
             model_.castShadow = true;
