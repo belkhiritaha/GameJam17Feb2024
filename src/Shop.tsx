@@ -16,7 +16,7 @@ export default class Shop extends Component<ShopProps> {
     public textSize : number = 1;
 
     public coinPrice : number = 2;
-    public numItems : number = 10;
+    public numItems : number = 4;
 
     public distanceToBuy : number = 3;
 
