@@ -61,6 +61,7 @@ p { margin: 0; }
 
 #viseur {
   font-family: myFirstFont;
+  pointer-events: none !important;
   font-size: 50px;
 	position: absolute;
   text-align: center;
