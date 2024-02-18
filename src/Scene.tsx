@@ -37,6 +37,11 @@ export default class Scene extends Component<SceneProps> {
     public model_mage_skeleton: any;
     public model_rogue_skeleton: any;
 
+    public sound_hit: any;
+
+
+
+
     constructor( props : SceneProps ) {
         super( props );
         this.camera.rotation.order = 'YXZ';
@@ -76,13 +81,31 @@ export default class Scene extends Component<SceneProps> {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.container?.appendChild( this.renderer.domElement );
 
+        const listener = new THREE.AudioListener();
+        this.camera.add( listener );
+
+        // create a global audio source
+        const sound = new THREE.Audio( listener );
+
+        // load a sound and set it as the Audio object's buffer
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load( 'sounds/mixkit-basketball-ball-hard-hit-2093.wav', function( buffer ) {
+            const sound_ = sound;
+            sound_.setBuffer( buffer );
+            sound_.setLoop( true );
+            sound_.setVolume( 0.5 );
+            this.sound_hit = sound_;
+
+            sound.play();
+        });
+
+
         const SPHERE_RADIUS = 0.3;
 
         // load map
         this.loadMap();
 
-        // load 5 coins
-
+        // load coins
         for(let i=0; i<20; i++) {
             this.loadCoin( new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), new THREE.Vector3(0, 0, 0), true );
         }
