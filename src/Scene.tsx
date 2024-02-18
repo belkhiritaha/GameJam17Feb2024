@@ -21,6 +21,7 @@ export default class Scene extends Component<SceneProps> {
 
     public scene = new THREE.Scene();
     public player : any;
+    public shop : any;
 
     public mobs : any[] = [];
 
@@ -81,7 +82,7 @@ export default class Scene extends Component<SceneProps> {
 
         // load 5 coins
         for(let i=0; i<5; i++) {
-            this.loadCoin( new THREE.Vector3( Math.random() * 20, 5, Math.random() * 20 ), new THREE.Vector3(0, 0, 0), true );
+            this.loadCoin( new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), new THREE.Vector3(0, 0, 0), true );
         }
         // and 4 others
         this.loadOthers( 'torch.gltf.glb', SPHERE_RADIUS, new THREE.Vector3( 0, -100, 0 ), new THREE.Vector3(0, 0, 0), false );

@@ -65,6 +65,31 @@ export default class Player extends Component<PlayerProps> {
 
         }
 
+        if ( this.keyStates[ 'KeyE' ] ) {
+            console.log("E");
+            // if distance between camera and shop is less than 2, then open shop
+            if (!this.props.scene.shop.gltf) return;
+            const distance = this.props.scene.camera.position.distanceTo(this.props.scene.shop.gltf.position);
+            console.log(distance);
+            if (distance < this.props.scene.shop.distanceToBuy) {
+                console.log(this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length);
+                if (this.props.scene.list_coins.map( ( coin : any ) => !coin.isOnGround ? coin : null ).filter( ( coin : any ) => coin !== null ).length >= this.props.scene.shop.coinPrice) {
+                    console.log("buy");
+                    // remove from list_coins coinPrice coins that are not on ground
+                    for (let i = 0; i < this.props.scene.shop.coinPrice; i++) {
+                        this.props.scene.list_coins.splice(this.props.scene.list_coins.findIndex((coin : any) => !coin.isOnGround), 1);
+                    }
+
+                    // add numItems 
+                    for (let i = 0; i < this.props.scene.shop.numItems; i++) {
+                        this.props.scene.loadOthers( "key.gltf.glb", 0.3 , new THREE.Vector3(0, -100, 0), new THREE.Vector3(0, 0, 0), false );
+                    }
+                }
+            }
+            this.keyStates[ 'KeyE' ] = false;
+        }
+            
+
         if ( this.playerOnFloor ) { if ( this.keyStates[ 'Space' ] ) { this.playerVelocity.y = 5; } }
 
     }

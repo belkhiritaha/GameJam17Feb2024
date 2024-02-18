@@ -5,6 +5,7 @@ import Player from './Player';
 import Scene from './Scene';
 import Sphere from './Sphere';
 import Mob from './Mob';
+import Shop from './Shop';
 
 function App() {
     let mouseTime = 0;
@@ -14,8 +15,11 @@ function App() {
     const player = new Player( { gravity: 30, scene, mouseTime } );
     scene.player = player;
 
+    const shop = new Shop( { scene } );
+    scene.shop = shop;
+
     const mobs : any[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 0; i++) {
         const mob = new Mob( { gravity: 100, scene, position: new THREE.Vector3( Math.random() * 10, 5, Math.random() * 10 ), id: i, model_path: "Skeleton_Mage.glb" } );
         mobs.push(mob);
     }
@@ -80,6 +84,7 @@ function App() {
                 mob.updateMob(deltaTime);
             });
 
+            shop.update();
         }
 
         scene.renderer.render( scene.scene, scene.camera );
